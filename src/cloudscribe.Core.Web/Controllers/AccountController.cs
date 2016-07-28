@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2014-10-26
-// Last Modified:			2016-06-19
+// Last Modified:			2016-06-25
 // 
 
 using cloudscribe.Core.Identity;
@@ -257,7 +257,7 @@ namespace cloudscribe.Core.Web.Controllers
             
             var model = new RegisterViewModel();
             model.SiteId = Site.Id;
-            model.AgreementRequired = Site.RegistrationAgreement.Length > 0;
+            
 
             if ((Site.CaptchaOnRegistration)&& (Site.RecaptchaPublicKey.Length > 0))
             {
@@ -266,6 +266,7 @@ namespace cloudscribe.Core.Web.Controllers
             model.UseEmailForLogin = Site.UseEmailForLogin;
             model.RegistrationPreamble = Site.RegistrationPreamble;
             model.RegistrationAgreement = Site.RegistrationAgreement;
+            model.AgreementRequired = Site.RegistrationAgreement.Length > 0;
             model.ExternalAuthenticationList = signInManager.GetExternalAuthenticationSchemes();
 
             return View(model);
@@ -286,6 +287,7 @@ namespace cloudscribe.Core.Web.Controllers
             model.UseEmailForLogin = Site.UseEmailForLogin;
             model.RegistrationPreamble = Site.RegistrationPreamble;
             model.RegistrationAgreement = Site.RegistrationAgreement;
+            model.AgreementRequired = Site.RegistrationAgreement.Length > 0;
             model.ExternalAuthenticationList = signInManager.GetExternalAuthenticationSchemes();
 
             bool isValid = ModelState.IsValid;
@@ -412,7 +414,6 @@ namespace cloudscribe.Core.Web.Controllers
                         else
                         {
                             await signInManager.SignInAsync(user, isPersistent: false);
-                            //return Redirect("/");
                             return this.RedirectToSiteRoot(Site);
                         }
                     }
@@ -428,6 +429,11 @@ namespace cloudscribe.Core.Web.Controllers
         [AllowAnonymous]
         public IActionResult PendingApproval(Guid userId, bool didSend = false)
         {
+            if (signInManager.IsSignedIn(User))
+            {
+                return this.RedirectToSiteRoot(Site);
+            }
+
             var model = new PendingNotificationViewModel();
             model.UserId = userId;
             model.DidSend = didSend;
@@ -439,6 +445,10 @@ namespace cloudscribe.Core.Web.Controllers
         [AllowAnonymous]
         public IActionResult EmailConfirmationRequired(Guid userId, bool didSend = false)
         {
+            if (signInManager.IsSignedIn(User))
+            {
+                return this.RedirectToSiteRoot(Site);
+            }
             var model = new PendingNotificationViewModel();
             model.UserId = userId;
             model.DidSend = didSend;
@@ -455,13 +465,11 @@ namespace cloudscribe.Core.Web.Controllers
 
             if(user == null)
             {
-                //return Redirect("/");
                 return this.RedirectToSiteRoot(Site);
             }
 
             if(user.EmailConfirmed)
             {
-                //return Redirect("/");
                 return this.RedirectToSiteRoot(Site);
             }
 
@@ -486,7 +494,10 @@ namespace cloudscribe.Core.Web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
-
+            if (signInManager.IsSignedIn(User))
+            {
+                return this.RedirectToSiteRoot(Site);
+            }
             if (userId == null || code == null)
             {
                 return View("Error");
@@ -497,14 +508,16 @@ namespace cloudscribe.Core.Web.Controllers
                 return View("Error");
             }
             var result = await userManager.ConfirmEmailAsync(user, code);
-            
-            if (Site.RequireApprovalBeforeLogin && ! user.AccountApproved)
+            if(result.Succeeded)
             {
-                emailSender.AccountPendingApprovalAdminNotification(Site, user).Forget();
+                if (Site.RequireApprovalBeforeLogin && !user.AccountApproved)
+                {
+                    await emailSender.AccountPendingApprovalAdminNotification(Site, user).ConfigureAwait(false);
 
-                return RedirectToAction("PendingApproval", new { userId = user.Id, didSend = true });
+                    return RedirectToAction("PendingApproval", new { userId = user.Id, didSend = true });      
+                }
             }
-
+            
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
         }
 
@@ -532,7 +545,7 @@ namespace cloudscribe.Core.Web.Controllers
             // Request a redirect to the external login provider.
             var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl });
             var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
-            return new ChallengeResult(provider, properties);
+            return Challenge(properties, provider);
         }
 
         // GET: /Account/ExternalLoginCallback
@@ -553,7 +566,7 @@ namespace cloudscribe.Core.Web.Controllers
             if (info == null)
             {
                 log.LogDebug("ExternalLoginCallback redirecting to login because GetExternalLoginInfoAsync returned null ");
-                return RedirectToAction("Login");
+                return RedirectToAction(nameof(Login));
             }
             
             // Sign in the user with this external login provider if the user already has a login.
@@ -575,7 +588,7 @@ namespace cloudscribe.Core.Web.Controllers
             if (result.RequiresTwoFactor)
             {
                 log.LogDebug("ExternalLoginCallback ExternalLoginSignInAsync RequiresTwoFactor ");
-                return RedirectToAction("SendCode", new { ReturnUrl = returnUrl });
+                return RedirectToAction(nameof(SendCode), new { ReturnUrl = returnUrl });
             }
 
             if (result.IsNotAllowed)
@@ -595,7 +608,12 @@ namespace cloudscribe.Core.Web.Controllers
                 ViewData["ReturnUrl"] = returnUrl;
                 ViewData["LoginProvider"] = info.LoginProvider;
                 var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email });
+                var model = new ExternalLoginConfirmationViewModel();
+                model.Email = email;
+                model.RegistrationPreamble = Site.RegistrationPreamble;
+                model.RegistrationAgreement = Site.RegistrationAgreement;
+                model.AgreementRequired = Site.RegistrationAgreement.Length > 0;
+                return View("ExternalLoginConfirmation", model);
             }
 
         }
@@ -608,10 +626,10 @@ namespace cloudscribe.Core.Web.Controllers
         {
             log.LogDebug("ExternalLoginConfirmation called with returnurl " + returnUrl);
 
-            if (signInManager.IsSignedIn(User))
-            {
-                return RedirectToAction("Index", "Manage");
-            }
+            //if (signInManager.IsSignedIn(User))
+            //{
+            //    return RedirectToAction("Index", "Manage");
+            //}
 
             if (ModelState.IsValid)
             {
@@ -666,6 +684,9 @@ namespace cloudscribe.Core.Web.Controllers
                                 sr["Confirm your account"],
                                 callbackUrl).Forget();
 
+                            // this is needed to clear the external cookie - wasn't needed in rc2
+                            await signInManager.SignOutAsync();
+
                             if (this.SessionIsAvailable())
                             {
                                 this.AlertSuccess(sr["Please check your email inbox, we just sent you a link that you need to click to confirm your account"], true);
@@ -682,6 +703,10 @@ namespace cloudscribe.Core.Web.Controllers
                             if (Site.RequireApprovalBeforeLogin)
                             {
                                 emailSender.AccountPendingApprovalAdminNotification(Site, user).Forget();
+
+                                // this is needed to clear the external cookie - wasn't needed in rc2
+                                await signInManager.SignOutAsync();
+
                                 return RedirectToAction("PendingApproval", new { userId = user.Id, didSend = true });
                             }
                             else
@@ -714,6 +739,9 @@ namespace cloudscribe.Core.Web.Controllers
             else
             {
                 log.LogDebug("ExternalLoginConfirmation called with ModelStateInvalid ");
+                model.RegistrationPreamble = Site.RegistrationPreamble;
+                model.RegistrationAgreement = Site.RegistrationAgreement;
+                model.AgreementRequired = Site.RegistrationAgreement.Length > 0;
             }
 
             ViewData["ReturnUrl"] = returnUrl;
@@ -943,7 +971,15 @@ namespace cloudscribe.Core.Web.Controllers
             }
 
         }
-        
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            ViewData["Title"] = sr["Oops something went wrong"];
+            return View();
+        }
+
         #region Helpers
 
 

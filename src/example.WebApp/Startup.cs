@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.Razor;
 using System.Globalization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace example.WebApp
 {
@@ -45,6 +46,8 @@ namespace example.WebApp
             Configuration = builder.Build();
 
             appBasePath = env.ContentRootPath;
+
+            
         }
 
         private string appBasePath;
@@ -62,7 +65,7 @@ namespace example.WebApp
             services.AddDataProtection()
                 .PersistKeysToFileSystem(new System.IO.DirectoryInfo(pathToCryptoKeys));
 
-            // waiting for rc2 compatible glimpse
+            // waiting for RTM compatible glimpse
             //bool enableGlimpse = Configuration.GetValue("DiagnosticOptions:EnableGlimpse", false);
 
             //if (enableGlimpse)
@@ -86,6 +89,7 @@ namespace example.WebApp
             services.AddOptions();
 
             /* optional and only needed if you are using cloudscribe Logging  */
+            //services.AddCloudscribeLoggingNoDbStorage(Configuration);
             services.AddCloudscribeLogging();
 
             /* these are optional and only needed if using cloudscribe Setup */
@@ -149,12 +153,19 @@ namespace example.WebApp
                 //  return new ProviderCultureResult("en");
                 //}));
             });
-            
+
+            services.Configure<MvcOptions>(options =>
+            {
+                options.Filters.Add(new RequireHttpsAttribute());
+            });
+
             services.AddMvc()
                     .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                     .AddDataAnnotationsLocalization()
                     .AddRazorOptions(options =>
                     {
+                        options.AddCloudscribeViewLocationFormats();
+
                         options.AddEmbeddedViewsForNavigation();
                         options.AddEmbeddedViewsForCloudscribeCore();
                         options.AddEmbeddedViewsForCloudscribeLogging();
@@ -163,6 +174,8 @@ namespace example.WebApp
                     ;
 
             ConfigureDataStorage(services);
+
+           
 
             //var container = new Container();
             //container.Populate(services);
@@ -179,16 +192,13 @@ namespace example.WebApp
             ILoggerFactory loggerFactory,
             IOptions<cloudscribe.Core.Models.MultiTenantOptions> multiTenantOptionsAccessor,
             IServiceProvider serviceProvider,
-            IOptions<RequestLocalizationOptions> localizationOptionsAccessor
+            IOptions<RequestLocalizationOptions> localizationOptionsAccessor,
+            cloudscribe.Logging.Web.ILogRepository logRepo
             )
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-            var storage = Configuration["DevOptions:DbPlatform"];
-            if(storage != "NoDb")
-            {   
-                ConfigureLogging(loggerFactory, serviceProvider);
-            }
+            ConfigureLogging(loggerFactory, serviceProvider, logRepo);
             
             if (env.IsDevelopment())
             {
@@ -196,11 +206,7 @@ namespace example.WebApp
                 app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
             }
-            //else
-            //{
-            //    app.UseExceptionHandler("/Home/Error");
-            //}
-
+           
             app.UseForwardedHeaders();
 
             app.UseStaticFiles();
@@ -214,7 +220,6 @@ namespace example.WebApp
 
             app.UseMultitenancy<cloudscribe.Core.Models.SiteSettings>();
 
-            //app.UseTenantContainers<SiteSettings>();
             var multiTenantOptions = multiTenantOptionsAccessor.Value;
 
             app.UsePerTenant<cloudscribe.Core.Models.SiteSettings>((ctx, builder) =>
@@ -255,18 +260,16 @@ namespace example.WebApp
                     );
                 builder.UseCookieAuthentication(appCookieOptions);
 
-                //
                 // known issue here is if a site is updated to populate the
                 // social auth keys, it currently requires a restart so that the middleware gets registered
                 // in order for it to work or for the social auth buttons to appear 
                 builder.UseSocialAuth(ctx.Tenant, externalCookieOptions, shouldUseFolder);
                 
             });
-
             
-
             UseMvc(app, multiTenantOptions.Mode == cloudscribe.Core.Models.MultiTenantMode.FolderName);
-            
+
+            var storage = Configuration["DevOptions:DbPlatform"];
             switch (storage)
             {
                 case "NoDb":
@@ -279,7 +282,7 @@ namespace example.WebApp
                     CoreEFStartup.InitializeDatabaseAsync(app.ApplicationServices).Wait();
 
                     // this one is only needed if using cloudscribe Logging with EF as the logging storage
-                    LoggingEFStartup.InitializeDatabaseAsync(app.ApplicationServices).Wait();
+                    //LoggingEFStartup.InitializeDatabaseAsync(app.ApplicationServices).Wait();
 
                     break;
             }
@@ -316,11 +319,12 @@ namespace example.WebApp
 
             options.LoginPath = tenantPathBase + "/account/login";
             options.LogoutPath = tenantPathBase + "/account/logoff";
-            
+            options.AccessDeniedPath = tenantPathBase + "/account/accessdenied";
+
             options.Events = cookieEvents;
 
             options.AutomaticAuthenticate = true;
-            options.AutomaticChallenge = true;
+            options.AutomaticChallenge = false;
            
 
             return options;
@@ -345,7 +349,9 @@ namespace example.WebApp
                 options.CookieName = $"{scheme}-{tenant.SiteFolderName}";
                 options.CookiePath = "/" + tenant.SiteFolderName;
             }
-            
+
+            options.AutomaticAuthenticate = false;
+
             return options;
 
         }
@@ -445,6 +451,8 @@ namespace example.WebApp
             {
                 case "NoDb":
                     services.AddCloudscribeCoreNoDbStorage();
+                    // only needed if using cloudscribe logging with NoDb storage
+                    services.AddCloudscribeLoggingNoDbStorage(Configuration);
                     break;
 
                 case "ef":
@@ -454,27 +462,28 @@ namespace example.WebApp
 
                     // only needed if using cloudscribe logging with EF storage
                     services.AddCloudscribeLoggingEFStorage(connectionString);
+                    
 
 
                     break;
             }
         }
 
-        private void ConfigureLogging(ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+        private void ConfigureLogging(
+            ILoggerFactory loggerFactory, 
+            IServiceProvider serviceProvider
+            , cloudscribe.Logging.Web.ILogRepository logRepo
+            )
         {
-            //var logRepository = serviceProvider.GetService<cloudscribe.Logging.Web.ILogRepository>();
-
-            loggerFactory.AddConsole(minLevel: LogLevel.Warning);
-
+            
             // a customizable filter for logging
-            LogLevel minimumLevel = LogLevel.Warning;
+            LogLevel minimumLevel = LogLevel.Information;
 
             // add exclusions to remove noise in the logs
             var excludedLoggers = new List<string>
             {
-                "Microsoft.Data.Entity.Storage.Internal.RelationalCommandBuilderFactory",
-                "Microsoft.Data.Entity.Query.Internal.QueryCompiler",
-                "Microsoft.Data.Entity.DbContext",
+                "Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware",
+                "Microsoft.AspNetCore.Hosting.Internal.WebHost",
             };
 
             Func<string, LogLevel, bool> logFilter = (string loggerName, LogLevel logLevel) =>
@@ -492,7 +501,7 @@ namespace example.WebApp
                 return true;
             };
             
-            loggerFactory.AddDbLogger(serviceProvider, logFilter);
+            loggerFactory.AddDbLogger(serviceProvider, logFilter, logRepo);
         }
     }
 }

@@ -44,3 +44,8 @@ Check "Require Confirmed Email" && provide smtp settings so email can be sent fo
 ** This should be true even if using social auth to create the account
 
 -- end tested 2016-06-19
+
+Replace jqueryui datepicker with bootstrap datetime picker
+Redesign email templating for email to use Razor views 
+Show registration agree ment on social auth confirm
+Implement sorting links on user list

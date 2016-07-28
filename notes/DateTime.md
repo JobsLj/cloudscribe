@@ -10,7 +10,6 @@ https://github.com/sbstjn/timesheet.js
 
 # Date/Time picker implementations
 
-notes here are mostly out of date from back when I was doing early prototyping in MVC 5
 
 Will be nice when all browsers support their own date time pickers for html 5 (I think only Opera has it).
 
@@ -59,6 +58,8 @@ ViewBag.DateFormat = dateFormat;
 
 **References**
 
+https://github.com/chmln/flatpickr
+
 https://jqueryui.com/datepicker/   **our implementation uses this**
 http://api.jqueryui.com/datepicker/
 
@@ -71,3 +72,15 @@ https://github.com/adamalbrecht/ngQuickDate
 https://github.com/g00fy-/angular-datepicker
 
 https://github.com/telerik/kendo-ui-core apache 2 license
+
+http://momentjs.com/docs/#/displaying/format/
+http://eonasdan.github.io/bootstrap-datetimepicker/Options/#defaultdate
+
+data-cs-datepicker="true"
+data-cs-datepicker-show-time="false"
+data-cs-datepicker-show-time-only="false"
+data-cs-datepicker-show-month-list="true"
+data-cs-datepicker-show-year-list="true"
+data-cs-datepicker-year-range="c-100:c+0"
+data-cs-datepicker-dateformat="@ViewBag.DateFormat"
+data-cs-datepicker-timeformat="@ViewBag.TimeFormat" />

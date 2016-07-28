@@ -1,11 +1,12 @@
 ﻿
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
-
+using System.Globalization;
 
 namespace cloudscribe.Core.Web.Test
 {
@@ -15,6 +16,35 @@ namespace cloudscribe.Core.Web.Test
     /// </summary>
     public class CodeWorksAsIntendedTests
     {
+        //[Fact]
+        //public void ParseExact_Works_As_I_Think()
+        //{
+        //    var folderName = "20160702";
+        //    var dt1 = new DateTime(2016, 7, 2);
+        //    var parsed = DateTime.ParseExact(folderName, "yyyyMMdd", CultureInfo.InvariantCulture);
+
+        //    Assert.True(dt1.Year == parsed.Year);
+        //    Assert.True(dt1.Month == parsed.Month);
+        //    Assert.True(dt1.Day == parsed.Day);
+
+
+        //}
+
+        //[Fact]
+        //public void Path_Combine_Works_As_I_Think()
+        //{
+        //    var firstSegment = "foo\\";
+
+        //    var combined = Path.Combine(firstSegment, "bar");
+
+        //    Assert.True(combined == "foo\\bar");
+
+        //    var segment = "foo";
+
+        //    var combined2 = Path.Combine(segment, "bar");
+
+        //    Assert.True(combined2 == "foo\\bar");
+        //}
 
         //[Fact]
         //public void Can_Derived_Class_Hide_Base_Property()
@@ -46,11 +76,11 @@ namespace cloudscribe.Core.Web.Test
         //        );
 
         //    Assert.True("Foo" == theFoo.FooName);
-            
+
         //    var theRevealer = new FooHider(theFoo, true);
 
         //    Assert.True("Foo" == theRevealer.InnerFoo.FooName);
-            
+
         //    var fooFrocess = new FooProcessor(theRevealer);
         //    string fooResult = fooFrocess.GimmeTheName();
 

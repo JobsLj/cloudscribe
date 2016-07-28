@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2016-05-07
-// Last Modified:			2016-06-11
+// Last Modified:			2016-06-28
 // 
 
 
@@ -56,15 +56,15 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddScoped<IVersionProviderFactory, VersionProviderFactory>();
             services.AddScoped<IVersionProvider, CloudscribeCoreVersionProvider>();
-
-            services.AddTransient<IEmailTemplateService, HardCodedEmailTemplateService>();
+            
             services.AddTransient<ISiteMessageEmailSender, SiteEmailMessageSender>();
             //services.AddTransient<ISiteMessageEmailSender, FakeSiteEmailSender>();
             
             services.AddTransient<ISmsSender, SiteSmsSender>();
 
             services.AddSingleton<IThemeListBuilder, SiteThemeListBuilder>();
-            services.AddSingleton<IRazorViewEngine, CoreViewEngine>();
+            //services.AddSingleton<IRazorViewEngine, CoreViewEngine>();
+            services.TryAddScoped<ViewRenderer, ViewRenderer>();
 
             services.AddScoped<INodeUrlPrefixProvider, FolderTenantNodeUrlPrefixProvider>();
             services.AddCloudscribeNavigation(configuration);
@@ -85,6 +85,20 @@ namespace Microsoft.Extensions.DependencyInjection
                     typeof(SiteManager).GetTypeInfo().Assembly,
                     "cloudscribe.Core.Web"
                 ));
+
+            return options;
+        }
+
+        
+
+        public static RazorViewEngineOptions AddCloudscribeViewLocationFormats(this RazorViewEngineOptions options)
+        {
+            options.ViewLocationFormats.Add("/Views/Sys/{1}/{0}" + RazorViewEngine.ViewExtension);
+            options.ViewLocationFormats.Add("/Views/Sys/Shared/{0}" + RazorViewEngine.ViewExtension);
+
+            options.AreaViewLocationFormats.Add("/Areas/{2}/Views/Sys/{1}/{0}" + RazorViewEngine.ViewExtension);
+            options.AreaViewLocationFormats.Add("/Areas/{2}/Views/Sys/Shared/{0}" + RazorViewEngine.ViewExtension);
+            options.AreaViewLocationFormats.Add("/Views/Sys/Shared/{0}" + RazorViewEngine.ViewExtension);
 
             return options;
         }
