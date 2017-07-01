@@ -1,5 +1,12 @@
 
 
+https://www.contextis.com/resources/blog/comma-separated-vulnerabilities/
+
+
+https://scotthelme.co.uk/csrf-is-dead/
+
+http://blog.novanet.no/a-pile-of-anti-forgery-cookies/
+
 Input Filtering:
 
 Our approach in mojoPortal has always been to assume that in fact a user can insert malicious content in a wysiwyg editor. We distinguish between untrusted users and trusted users, and untrusted content vs trusted content created by the corresponding user type.
@@ -51,4 +58,5 @@ http://caniuse.com/contentsecuritypolicy
 need to google Content Security Policy for more info, I think I recal a .NET library
 probably can find or implement something that plugs into the owin pipeline
 
+https://stackoverflow.com/questions/20504846/why-is-it-common-to-put-csrf-prevention-tokens-in-cookies
 

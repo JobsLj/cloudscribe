@@ -1,4 +1,8 @@
 
+ASP.NET Core - Feature Slices for ASP.NET Core MVC
+https://msdn.microsoft.com/magazine/mt763233
+
+
 Walkthrough: Organizing an ASP.NET MVC Application using Areas
 .NET Framework 4
 
@@ -81,3 +85,6 @@ but then realized I could refactor that functionality as extension methods so th
 
 ASP.NET MVC 5 Authentication Filters
 http://www.dotnetcurry.com/showarticle.aspx?ID=957
+
+ASP.NET Core - Real-World ASP.NET Core MVC Filters
+https://msdn.microsoft.com/en-us/magazine/mt767699.aspx

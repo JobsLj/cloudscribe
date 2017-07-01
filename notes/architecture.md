@@ -1,4 +1,19 @@
 
+https://www.microsoft.com/net/learn/architecture
+
+https://cloud.google.com/apis/design/
+
+Actor Model
+https://github.com/dotnet/orleans
+http://dotnet.github.io/orleans/
+https://blogs.msdn.microsoft.com/orleans/2016/12/05/orleans-20-tech-preview-net-core/
+
+http://blog.ploeh.dk/2017/02/02/dependency-rejection/
+http://blog.ploeh.dk/2016/03/18/functional-architecture-is-ports-and-adapters/
+
+Cutting Edge - CQRS and Message-Based Applications
+https://msdn.microsoft.com/en-us/magazine/mt238399.aspx?f=255&MSPPError=-2147217396
+
 Inheritance in ViewModels
 I had been struggling in my own thought about how to be DRY (Don't Repeat Yourself) with ViewModels
 because I have similar but different views for user Registration and for Admins to create or edit users
@@ -35,6 +50,8 @@ I had some doubts about commands returning only void, to me it seemed reasonable
 indicating success or failure of the command, but this article set me straight
 http://blog.iannelson.systems/back-to-basics-on-the-use-and-abuse-of-the-humble-boolean/
 
+http://dotnet.github.io/orleans/
+
 http://rob.conery.io/2014/03/04/repositories-and-unitofwork-are-not-a-good-idea/
 
 https://blog.rendle.io/do-one-thing-and-do-it-well/
@@ -45,3 +62,47 @@ http://joeduffyblog.com/2010/09/06/the-premature-optimization-is-evil-myth/
 http://shazwazza.com/post/custom-assembly-loading-with-aspnet-core/
 
 http://blog.ploeh.dk/2011/04/27/Providerisnotapattern/
+
+Why scaling and parallelism remain hard even with new tools and languages
+https://www.erlang-solutions.com/blog/the-continuing-headaches-of-distributed-programming.html
+
+## Micro Services Architecture
+
+https://github.com/AdaptiveConsulting/ReactiveTraderCloud
+
+https://msdn.microsoft.com/en-us/library/hh242985(v=vs.103).aspx
+
+http://docs.geteventstore.com/introduction/3.8.1//
+
+http://weareadaptive.com/2014/04/18/asynchrony-concurrency/
+
+https://github.com/Reactive-Extensions/Rx.NET
+
+observables https://msdn.microsoft.com/library/dd990377.aspx
+schedulers https://msdn.microsoft.com/en-us/library/hh242963.aspx
+querying observable sequences with linq
+https://msdn.microsoft.com/en-us/library/hh242983.aspx
+
+http://blog.runnable.com/post/149676042396/lessons-learned-while-building-microservices
+
+https://jackmott.github.io/programming/2016/08/30/think-before-you-parallelize.html
+
+ASP.NET Core - Feature Slices for ASP.NET Core MVC
+https://msdn.microsoft.com/magazine/mt763233
+
+http://stackoverflow.com/questions/148747/what-is-the-difference-between-a-framework-and-a-library
+
+https://medium.com/@cscalfani/goodbye-object-oriented-programming-a59cda4c0e53#.tf8xilhuk
+
+https://medium.freecodecamp.com/imperative-vs-declarative-programming-283e96bf8aea#.hyf6bmgjr
+
+http://www.hanselman.com/blog/Stateless30AStateMachineLibraryForNETCore.aspx
+
+https://twitter.com/clemensv/status/831462231808339971/photo/1
+https://gist.github.com/clemensv/650361dc37b1eb77a91d00dbc1611288
+
+https://blogs.msdn.microsoft.com/ericlippert/2009/04/27/the-stack-is-an-implementation-detail-part-one/
+https://blogs.msdn.microsoft.com/ericlippert/2009/05/04/the-stack-is-an-implementation-detail-part-two/
+
+
+https://visualstudiomagazine.com/articles/2017/04/01/template-method-pattern.aspx

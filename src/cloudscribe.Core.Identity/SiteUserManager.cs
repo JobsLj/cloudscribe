@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:				    2014-07-22
-// Last Modified:		    2016-05-18
+// Last Modified:		    2017-05-22
 // 
 //
 
@@ -13,9 +13,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using System.Security.Claims;
 
 namespace cloudscribe.Core.Identity
 {
@@ -26,7 +28,8 @@ namespace cloudscribe.Core.Identity
     public class SiteUserManager<TUser> : UserManager<TUser> where TUser : SiteUser
     {        
         public SiteUserManager(
-            SiteSettings currentSite,
+            SiteContext currentSite,
+            UserEvents userEventHandlers,
             IUserCommands userCommands,
             IUserQueries userQueries,
             IUserStore<TUser> store,
@@ -64,6 +67,7 @@ namespace cloudscribe.Core.Identity
             multiTenantOptions = multiTenantOptionsAccessor.Value;
             this.contextAccessor = contextAccessor;
             httpContext = contextAccessor?.HttpContext;
+            eventHandlers = userEventHandlers;
         }
         
         private IdentityOptions identityOptions;
@@ -73,10 +77,11 @@ namespace cloudscribe.Core.Identity
         private MultiTenantOptions multiTenantOptions;
         private IHttpContextAccessor contextAccessor;
         private HttpContext httpContext;
+        private UserEvents eventHandlers;
 
-        private CancellationToken CancellationToken => httpContext?.RequestAborted ?? CancellationToken.None;
+        //private CancellationToken CancellationToken => httpContext?.RequestAborted ?? CancellationToken.None;
 
-        private ISiteSettings siteSettings = null;
+        private ISiteContext siteSettings = null;
 
         internal IUserLockoutStore<TUser> GetUserLockoutStore()
         {
@@ -88,7 +93,7 @@ namespace cloudscribe.Core.Identity
             return cast;
         }
         
-        public ISiteSettings Site { get { return siteSettings; } }
+        public ISiteContext Site { get { return siteSettings; } }
         
         public Task<bool> LoginIsAvailable(Guid userId, string loginName)
         {
@@ -194,13 +199,90 @@ namespace cloudscribe.Core.Identity
 
         }
 
+        public async Task<string> SuggestLoginNameFromEmail(Guid siteGuid, string email)
+        {
+            if (multiTenantOptions.UseRelatedSitesMode) { siteGuid = multiTenantOptions.RelatedSiteId; }
+
+            var login = email.Substring(0, email.IndexOf("@"));
+            var offset = 1;
+            // don't think we should make this async inside a loop
+            while (await queries.LoginExistsInDB(siteGuid, login).ConfigureAwait(false))
+            {
+                offset += 1;
+                login = email.Substring(0, email.IndexOf("@")) + offset.ToInvariantString();
+
+            }
+
+            return login;
+        }
+
+        public async Task<IdentityResult> TryCreateAccountForExternalUser(Guid siteId, ExternalLoginInfo info)
+        {
+            if (info == null || info.Principal == null) return null;
+
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrWhiteSpace(email)) return null; // not enough info
+
+            var userName = await SuggestLoginNameFromEmail(Site.Id, email);
+
+            var user = new SiteUser
+            {
+                SiteId = Site.Id,
+                UserName = userName,
+                Email = email,
+                DisplayName = email.Substring(0, email.IndexOf("@")),
+                FirstName = info.Principal.FindFirstValue(ClaimTypes.GivenName),
+                LastName = info.Principal.FindFirstValue(ClaimTypes.Surname),
+                AccountApproved = Site.RequireApprovalBeforeLogin ? false : true
+            };
+            var result = await CreateAsync(user as TUser);
+            if(result.Succeeded)
+            {
+                result = await AddLoginAsync(user as TUser, info);
+            }
+
+
+            return result;
+        }
+
         #region Overrides
+
+        public override async Task<IdentityResult> CreateAsync(TUser user)
+        {
+            var result = await base.CreateAsync(user);
+            if(result.Succeeded)
+            {
+                await eventHandlers.HandleUserCreated(user).ConfigureAwait(false);
+            }
+
+            return result;
+        }
+
+        public override async Task<IdentityResult> DeleteAsync(TUser user)
+        {
+            await eventHandlers.HandleUserPreDelete(user.SiteId, user.Id).ConfigureAwait(false);
+
+            return await base.DeleteAsync(user);
+        }
+
+        public override async Task<IdentityResult> UpdateAsync(TUser user)
+        {
+            await eventHandlers.HandleUserPreUpdate(user.SiteId, user.Id).ConfigureAwait(false);
+
+            var result = await base.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                await eventHandlers.HandleUserUpdated(user).ConfigureAwait(false);
+            }
+
+            return result;
+        }
 
         //public override async Task<string> GenerateEmailConfirmationTokenAsync(TUser user)
         //{
         //    Guid registerConfirmGuid = Guid.NewGuid();
         //    bool result = await userRepo.SetRegistrationConfirmationGuid(user.UserGuid, registerConfirmGuid, CancellationToken.None);
-            
+
         //    return registerConfirmGuid.ToString();
         //}
 

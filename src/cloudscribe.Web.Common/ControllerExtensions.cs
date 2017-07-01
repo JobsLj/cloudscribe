@@ -49,9 +49,16 @@ namespace cloudscribe.Web.Common.Extensions
 
         public static bool SessionIsAvailable(this Controller controller)
         {
-            var sessionFeature = controller.HttpContext.Features.Get<ISessionFeature>();
-            return (sessionFeature != null);
+            var feature = controller.HttpContext.Features.Get<ISessionFeature>();
+            return (feature != null);
         }
+
+        // this did not work, always false
+        //public static bool TempDataIsAvailable(this Controller controller)
+        //{
+        //    var feature = controller.HttpContext.Features.Get<ITempDataProvider>();
+        //    return (feature != null);
+        //}
 
         //public static RedirectResult RedirectToSiteRoot(this Controller controller, ISiteSettings site)
         //{
@@ -103,8 +110,8 @@ namespace cloudscribe.Web.Common.Extensions
             bool dismissable)
         {
             
-            if (controller.SessionIsAvailable())
-            {
+            //if (controller.TempDataIsAvailable())
+            //{
                 var alerts = controller.TempData.GetAlerts();
 
                 alerts.Add(new Alert
@@ -115,7 +122,7 @@ namespace cloudscribe.Web.Common.Extensions
                 });
 
                 controller.TempData.AddAlerts(alerts);
-            }
+            //}
 
         }
 
@@ -126,6 +133,7 @@ namespace cloudscribe.Web.Common.Extensions
 
         public static List<Alert> GetAlerts(this ITempDataDictionary tempData)
         {
+
             if(tempData.ContainsKey(Alert.TempDataKey))
             {
                 string json = (string)tempData[Alert.TempDataKey];

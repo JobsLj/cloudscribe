@@ -1,4 +1,13 @@
 
+http://blog.nuget.org/20170417/Package-identity-and-trust.html
+https://github.com/NuGet/Home/issues/1882
+
+
+https://docs.microsoft.com/en-us/nuget/create-packages/symbol-packages
+www.symbolsource.org/Public
+Package consumers can then add https://nuget.smbsrc.net/ to their symbol sources in Visual Studio. This allows consumers to step into your package code in the Visual Studio debugger.
+
+
 Targets
 https://github.com/dotnet/corefx/blob/master/Documentation/architecture/net-platform-standard.md
 https://blogs.infosupport.com/net-platform-standard-and-the-magic-of-imports/
@@ -112,3 +121,5 @@ http://blog.davidebbo.com/2011/04/easy-way-to-publish-nuget-packages-with.html
 
 http://docs.nuget.org/docs/creating-packages/hosting-your-own-nuget-feeds
 
+not sure I agree with this but interesting
+https://blog.ometer.com/2017/01/10/dear-package-managers-dependency-resolution-results-should-be-in-version-control/

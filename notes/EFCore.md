@@ -1,5 +1,25 @@
 
+https://stackoverflow.com/questions/44206205/ef-core-inject-dbcontext-with-many-potential-connection-strings
+
+
+https://blogs.msdn.microsoft.com/dotnet/2016/11/16/announcing-entity-framework-core-1-1/
+
+https://blogs.msdn.microsoft.com/dotnet/2016/09/29/implementing-seeding-custom-conventions-and-interceptors-in-ef-core-1-0/
+
+http://www.dotnetcurry.com/aspnet-mvc/1267/using-mongodb-nosql-database-with-aspnet-webapi-core
+
+http://www.stum.de/2016/08/24/thoughts-on-orms-2016-edition/
+http://robbygrodin.com/2017/04/18/wayfair-blog-post-orm-bankruptcy/
+
+a good example of the friction of relational storage vs document storage
+http://stackoverflow.com/questions/37370476/how-to-persist-a-list-of-strings-with-entity-framework-core
+
+
+https://blogs.msdn.microsoft.com/dotnet/2016/07/29/entity-framework-core-1-1-plans/
+
 https://blogs.msdn.microsoft.com/dotnet/2016/06/27/entity-framework-core-1-0-0-available/
+
+http://6figuredev.com/technology/generic-repository-dependency-injection-with-net-core/
 
 http://www.codeproject.com/Articles/114262/6-ways-of-doing-locking-in-NET-Pessimistic-and-opt
 
@@ -170,12 +190,20 @@ Options:
 dotnet ef migrations add Initial -c CoreDbContext
 dotnet ef migrations add Initial -c LoggingDbContext
 
+dotnet ef migrations add Initial -c SimpleContentDbContext
+dotnet ef migrations add AddMenuOnlyProp -c SimpleContentDbContext
+
 dotnet ef migrations add RemoveCurrecncy -c CoreDbContext
 dotnet ef migrations add Limitfieldsize -c CoreDbContext
 dotnet ef migrations add cleanup20160617 -c CoreDbContext
 dotnet ef migrations add cleanup20160617-2 -c CoreDbContext
 
 dotnet ef migrations add changes20160701 -c LoggingDbContext
+
+dotnet ef migrations add Initial -c ConfigurationDbContext
+dotnet ef migrations add Initial -c PersistedGrantDbContext
+
+
 
 No parameterless constructor was found on 'LoggingDbContext'. Either add a parameterless constructor to 'LoggingDbContext' or add an impleme
 ntation of 'IDbContextFactory<LoggingDbContext>' in the same assembly as 'LoggingDbContext'.

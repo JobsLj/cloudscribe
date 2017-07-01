@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2014-08-16
-// Last Modified:			2016-05-11
+// Last Modified:			2017-06-29
 // 
 
 using System;
@@ -38,16 +38,16 @@ namespace cloudscribe.Core.Models
 
         string ConcurrencyStamp { get; set; }
 
-        // TODO use this to force ONLY social logins or ldap option?
+        
         bool DisableDbAuth { get; set; }
     
-        bool RequireConfirmedEmail { get; set; } // maps to UseSecureRegistration in ado data layers
+        bool RequireConfirmedEmail { get; set; } 
 
         // maps to IdentitySignInOptions
         //https://github.com/aspnet/Identity/blob/dev/src/Microsoft.AspNetCore.Identity/SignInOptions.cs
         bool RequireConfirmedPhone { get; set; }
 
-        bool RequireApprovalBeforeLogin { get; set; } // TODO: implement
+        bool RequireApprovalBeforeLogin { get; set; } 
         string AccountApprovalEmailCsv { get; set; }
 
         //https://github.com/aspnet/Identity/blob/dev/src/Microsoft.AspNetCore.Identity/LockoutOptions.cs
@@ -110,6 +110,7 @@ namespace cloudscribe.Core.Models
         bool CaptchaOnRegistration { get; set; }
         string RecaptchaPrivateKey { get; set; }
         string RecaptchaPublicKey { get; set; }
+        bool UseInvisibleRecaptcha { get; set; }
         
         //company info
         string CompanyCountry { get; set; }
@@ -162,7 +163,7 @@ namespace cloudscribe.Core.Models
 
 
         string PrivacyPolicy { get; set; }
-        string Theme { get; set; } //TODO: rename as Theme
+        string Theme { get; set; } 
         string GoogleAnalyticsProfileId { get; set; }
         
         //social login stuff
@@ -175,15 +176,21 @@ namespace cloudscribe.Core.Models
         string TwitterConsumerKey { get; set; }
         string TwitterConsumerSecret { get; set; }
 
-        
+        string OidConnectDisplayName { get; set; }
         string OidConnectAppId { get; set; }
         string OidConnectAppSecret { get; set; } // protected with data protection
+        string OidConnectAuthority { get; set; }
 
         string AddThisDotComUsername { get; set; }
 
         
         bool IsDataProtected { get; set; }
         DateTime CreatedUtc { get; set; }
+        DateTime TermsUpdatedUtc { get; set; }
+
+        string ForcedCulture { get; set; }
+
+        string ForcedUICulture { get; set; }
 
 
         // TODO: drop

@@ -1,9 +1,35 @@
 
+
+http://bulma.io/
+https://github.com/jgthms/bulma
+
+https://www.hanselman.com/blog/OptionsForCSSAndJSBundlingAndMinificationWithASPNETCore.aspx
+
+material design css
+https://getmdl.io/
+
+http://material.io/color
+
+http://yoksel.github.io/flex-cheatsheet/
+
+icon set created in pure css
+http://cssicon.space/#/icon/S
+
+https://bootstrapstudio.io/
+
+5 principles of modern css
+https://gist.github.com/alekseykulikov/68a5d6ddae569f6d0456b0e9d603e892
+
+http://www.khalidabuhakmeh.com/using-semantic-ui-with-asp-net-core
+
 http://blackbe.lt/removing-unused-css-selectors-with-google-chrome-tool/
+
+https://hacks.mozilla.org/2016/08/using-feature-queries-in-css/
 
 http://www.sitepoint.com/dustmeselectors/
 
 http://materializecss.com/
+https://material.io/
 
 http://www.csspurge.com/
 
@@ -29,7 +55,7 @@ http://benfoster.io/blog/asp-net-core-themes-and-multi-tenancy
 
 https://begriffs.com/posts/2016-05-28-rss-responsive-design.html?hn=1
 
-
+https://720kb.github.io/radiobox.css/
 
 wireframing
 https://balsamiq.com/

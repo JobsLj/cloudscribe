@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2014-08-16
-// Last Modified:			2016-06-06
+// Last Modified:			2017-06-29
 // 
 
 using System;
@@ -10,7 +10,7 @@ using System;
 namespace cloudscribe.Core.Models
 {
     //[Serializable()]
-    public class SiteSettings : SiteInfo, ISiteSettings
+    public class SiteSettings : SiteInfo, ISiteSettings, ISiteContext
     {
 
         public SiteSettings()
@@ -110,6 +110,8 @@ namespace cloudscribe.Core.Models
             set { recaptchaPublicKey = value; }
         }
 
+        public bool UseInvisibleRecaptcha { get; set; } = false;
+
         private string facebookAppId = string.Empty;
         public string FacebookAppId
         {
@@ -179,7 +181,21 @@ namespace cloudscribe.Core.Models
             get { return oidConnectAppSecret ?? string.Empty; }
             set { oidConnectAppSecret = value; }
         }
-        
+
+        private string oidConnectAuthority = string.Empty;
+        public string OidConnectAuthority
+        {
+            get { return oidConnectAuthority ?? string.Empty; }
+            set { oidConnectAuthority = value; }
+        }
+
+        private string oidConnectDisplayName = string.Empty;
+        public string OidConnectDisplayName
+        {
+            get { return oidConnectDisplayName ?? string.Empty; }
+            set { oidConnectDisplayName = value; }
+        }
+
         private string addThisDotComUsername = string.Empty;
         public string AddThisDotComUsername
         {
@@ -422,6 +438,12 @@ namespace cloudscribe.Core.Models
 
         public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
 
+        public DateTime TermsUpdatedUtc { get; set; } = DateTime.UtcNow;
+
+        public string ForcedCulture { get; set; }
+
+        public string ForcedUICulture { get; set; }
+
         //public bool UseSslOnAllPages { get; set; } = false;
 
         //public int PasswordAttemptWindowMinutes { get; set; } = 5;
@@ -500,6 +522,8 @@ namespace cloudscribe.Core.Models
             s.DkimDomain = i.DkimDomain;
             s.DkimSelector = i.DkimSelector;
             s.EmailLdapDbFallback = i.EmailLdapDbFallback;
+            s.ForcedCulture = i.ForcedCulture;
+            s.ForcedUICulture = i.ForcedUICulture;
             s.FacebookAppId = i.FacebookAppId;
             s.FacebookAppSecret = i.FacebookAppSecret;
             s.GoogleAnalyticsProfileId = i.GoogleAnalyticsProfileId;
@@ -521,6 +545,8 @@ namespace cloudscribe.Core.Models
             s.MinRequiredPasswordLength = i.MinRequiredPasswordLength;
             s.OidConnectAppId = i.OidConnectAppId;
             s.OidConnectAppSecret = i.OidConnectAppSecret;
+            s.OidConnectAuthority = i.OidConnectAuthority;
+            s.OidConnectDisplayName = i.OidConnectDisplayName;
             s.PreferredHostName = i.PreferredHostName;
             s.PrivacyPolicy = i.PrivacyPolicy;
             s.ReallyDeleteUsers = i.ReallyDeleteUsers;
@@ -552,14 +578,11 @@ namespace cloudscribe.Core.Models
             s.TimeZoneId = i.TimeZoneId;
             s.TwitterConsumerKey = i.TwitterConsumerKey;
             s.TwitterConsumerSecret = i.TwitterConsumerSecret;
+            s.UseInvisibleRecaptcha = i.UseInvisibleRecaptcha;
             s.UseEmailForLogin = i.UseEmailForLogin;
             s.UseLdapAuth = i.UseLdapAuth;
+            s.TermsUpdatedUtc = i.TermsUpdatedUtc;
            
-            
-            
-
-
-
             return s;
         }
 

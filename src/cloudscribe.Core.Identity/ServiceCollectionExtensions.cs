@@ -2,12 +2,13 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2016-05-07
-// Last Modified:			2016-06-19
+// Last Modified:			2016-11-26
 // 
 
 using cloudscribe.Core.Identity;
 using cloudscribe.Core.Models;
 using Microsoft.AspNetCore.Antiforgery.Internal;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -26,21 +27,19 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddSingleton<IOptions<IdentityOptions>, SiteIdentityOptionsResolver>();
 
-            //services.AddIdentity<SiteUser, SiteRole>()
-            //    .AddUserStore<UserStore<SiteUser>>()
-            //    .AddRoleStore<RoleStore<SiteRole>>()
-            //    .AddUserManager<SiteUserManager<SiteUser>>()
-            //    .AddRoleManager<SiteRoleManager<SiteRole>>()
-            //    .AddDefaultTokenProviders()
-            //    ;
-
+            
             // Services used by identity
 
-            services.AddScoped<IUserClaimsPrincipalFactory<SiteUser>, SiteUserClaimsPrincipalFactory<SiteUser, SiteRole>>();
-            services.AddScoped<IPasswordHasher<SiteUser>, SitePasswordHasher<SiteUser>>();
-            services.AddScoped<SiteSignInManager<SiteUser>, SiteSignInManager<SiteUser>>();
-            services.AddSingleton<SiteAuthCookieValidator, SiteAuthCookieValidator>();
-            services.AddScoped<SiteCookieAuthenticationEvents, SiteCookieAuthenticationEvents>();
+            services.TryAddScoped<IUserClaimsPrincipalFactory<SiteUser>, SiteUserClaimsPrincipalFactory<SiteUser, SiteRole>>();
+            services.TryAddScoped<IPasswordHasher<SiteUser>, SitePasswordHasher<SiteUser>>();
+            services.TryAddScoped<SiteSignInManager<SiteUser>, SiteSignInManager<SiteUser>>();
+            services.TryAddSingleton<SiteAuthCookieValidator, SiteAuthCookieValidator>();
+            services.TryAddScoped<SiteCookieAuthenticationEvents, SiteCookieAuthenticationEvents>();
+            services.TryAddScoped<ISocialAuthEmailVerfificationPolicy, DefaultSocialAuthEmailVerfificationPolicy>();
+
+            services.TryAddScoped<ISiteAcountCapabilitiesProvider, DefaultSiteAcountCapabilitiesProvider>();
+            services.TryAddScoped<IProcessAccountLoginRules, DefaultAccountLoginRulesProcessor>();
+
             services.AddSingleton<IAntiforgeryTokenStore, SiteAntiforgeryTokenStore>();
 
             services.AddAuthentication(options =>
@@ -66,7 +65,9 @@ namespace Microsoft.Extensions.DependencyInjection
             //services.TryAddScoped<SignInManager<SiteUser>, SignInManager<SiteUser>>();
             //services.TryAddScoped<RoleManager<SiteRole>, RoleManager<SiteRole>>();
 
-            services.AddScoped<ICustomClaimProvider, DoNothingCustomClaimProvider>();
+            services.AddScoped<UserEvents, UserEvents>();
+
+            services.TryAddScoped<ICustomClaimProvider, DoNothingCustomClaimProvider>();
 
             if (setupAction != null)
             {
@@ -90,16 +91,19 @@ namespace Microsoft.Extensions.DependencyInjection
                 options.ProviderMap[TokenOptions.DefaultEmailProvider] = new TokenProviderDescriptor(emailTokenProviderType);
                 options.ProviderMap[TokenOptions.DefaultPhoneProvider] = new TokenProviderDescriptor(phoneNumberProviderType);
             });
-            services.AddTransient(dataProtectionProviderType);
-            services.AddTransient(emailTokenProviderType);
-            services.AddTransient(phoneNumberProviderType);
+            services.TryAddTransient(dataProtectionProviderType);
+            services.TryAddTransient(emailTokenProviderType);
+            services.TryAddTransient(phoneNumberProviderType);
 
-            
 
+            services.TryAddScoped<IIdentityServerIntegration, NotIntegratedIdentityServerIntegration>();
 
             return builder;
 
             //return services;
         }
+
+        
+
     }
 }

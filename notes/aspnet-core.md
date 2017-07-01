@@ -1,4 +1,23 @@
 
+
+https://andrewlock.net/reloading-strongly-typed-options-in-asp-net-core-1-1-0/
+
+
+https://blogs.msdn.microsoft.com/dotnet/2017/01/30/announcing-net-core-net-native-and-nuget-updates-in-vs-2017-rc/
+
+https://blogs.msdn.microsoft.com/dotnet/2017/02/07/announcing-net-core-tools-updates-in-vs-2017-rc/
+
+https://www.asp.net/freecourses
+
+
+https://blogs.msdn.microsoft.com/webdev/2016/11/16/announcing-asp-net-core-1-1/
+
+https://blogs.msdn.microsoft.com/dotnet/2016/11/16/announcing-net-core-tools-msbuild-alpha/
+
+https://blogs.msdn.microsoft.com/dotnet/2016/11/16/announcing-net-core-1-1/
+
+https://blogs.msdn.microsoft.com/dotnet/2016/09/26/introducing-net-standard/
+
 https://blogs.msdn.microsoft.com/dotnet/2016/07/15/net-core-roadmap/
 
 https://blogs.msdn.microsoft.com/webdev/2016/06/27/announcing-asp-net-core-1-0/
@@ -6,6 +25,10 @@ https://blogs.msdn.microsoft.com/webdev/2016/06/27/announcing-asp-net-core-1-0/
 https://blogs.msdn.microsoft.com/dotnet/2016/06/27/announcing-net-core-1-0/
 
 http://mattwarren.org/2016/07/04/How-the-dotnet-CLI-tooling-runs-your-code/
+
+https://luisfsgoncalves.wordpress.com/2016/09/10/customizing-asp-net-core-mvc-filters-constraints-and-conventions/
+
+https://damienbod.com/2016/09/09/asp-net-core-action-arguments-validation-using-an-actionfilter/
 
 
 https://docs.microsoft.com/teamblog/introducing-net-core-docs/

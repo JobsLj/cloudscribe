@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2016-05-07
-// Last Modified:			2016-06-28
+// Last Modified:			2017-06-09
 // 
 
 
@@ -10,17 +10,25 @@ using cloudscribe.Core.Models;
 using cloudscribe.Core.Models.Setup;
 using cloudscribe.Core.Web;
 using cloudscribe.Core.Web.Components;
-using cloudscribe.Core.Web.Components.Editor;
 using cloudscribe.Core.Web.Components.Messaging;
+using cloudscribe.Core.Web.ExtensionPoints;
 using cloudscribe.Core.Web.Navigation;
+using cloudscribe.Messaging.Email;
+using cloudscribe.Web.Common;
+using cloudscribe.Web.Common.Components;
+using cloudscribe.Web.Common.Models;
 using cloudscribe.Web.Common.Razor;
 using cloudscribe.Web.Navigation;
+using cloudscribe.Web.Navigation.Caching;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.FileProviders;
-using System.Reflection;
+using Microsoft.Extensions.Options;
+using System;
+
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -30,27 +38,38 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            services.TryAddScoped<ISmtpOptionsProvider, SiteSmtpOptionsResolver>();
             services.Configure<MultiTenantOptions>(configuration.GetSection("MultiTenantOptions"));
-
+            services.Configure<SmtpOptions>(configuration.GetSection("SmtpOptions"));
+            services.Configure<RecaptchaKeys>(configuration.GetSection("RecaptchaKeys"));
             services.Configure<SiteConfigOptions>(configuration.GetSection("SiteConfigOptions"));
             services.Configure<UIOptions>(configuration.GetSection("UIOptions"));
-            services.Configure<CkeditorOptions>(configuration.GetSection("CkeditorOptions"));
+            
             services.Configure<CachingSiteResolverOptions>(configuration.GetSection("CachingSiteResolverOptions"));
             
            
             //services.AddMultitenancy<SiteSettings, SiteResolver>();
             
-            services.AddMultitenancy<SiteSettings, CachingSiteResolver>();
+            services.AddMultitenancy<SiteContext, CachingSiteResolver>();
             services.AddScoped<CacheHelper, CacheHelper>();
+
+            services.AddScoped<SiteEvents, SiteEvents>();
             services.AddScoped<SiteManager, SiteManager>();
+            services.AddScoped<AccountService, AccountService>();
             services.AddScoped<GeoDataManager, GeoDataManager>();
             services.AddScoped<SystemInfoManager, SystemInfoManager>();
             services.AddScoped<IpAddressTracker, IpAddressTracker>();
+            services.AddScoped<SiteTimeZoneService, SiteTimeZoneService>();
 
             services.AddScoped<SiteDataProtector>();
-            // timezone localization from NodaTime
-            services.AddCloudscribeCommmon();
+
+            services.TryAddScoped<ICkeditorOptionsResolver, SiteCkeditorOptionsResolver>();
             services.AddScoped<ITimeZoneIdResolver, RequestTimeZoneIdResolver>();
+
+            services.TryAddScoped<IHandleCustomRegistration, NoRegistrationCustomization>();
+
+            services.AddCloudscribeCommmon(configuration);
+            
 
             services.AddCloudscribePagination();
 
@@ -62,12 +81,26 @@ namespace Microsoft.Extensions.DependencyInjection
             
             services.AddTransient<ISmsSender, SiteSmsSender>();
 
-            services.AddSingleton<IThemeListBuilder, SiteThemeListBuilder>();
+            services.TryAddSingleton<IThemeListBuilder, SiteThemeListBuilder>();
             //services.AddSingleton<IRazorViewEngine, CoreViewEngine>();
             services.TryAddScoped<ViewRenderer, ViewRenderer>();
 
+            services.AddSingleton<IOptions<NavigationOptions>, SiteNavigationOptionsResolver>();
+            services.AddScoped<ITreeCacheKeyResolver, SiteNavigationCacheKeyResolver>();
             services.AddScoped<INodeUrlPrefixProvider, FolderTenantNodeUrlPrefixProvider>();
             services.AddCloudscribeNavigation(configuration);
+
+            // Identity ***
+            services.TryAddScoped<ISiteAcountCapabilitiesProvider, SiteAcountCapabilitiesProvider>();
+            services.AddCloudscribeIdentity();
+
+            services.AddScoped<IUserContextResolver, UserContextResolver>();
+            services.AddScoped<ISiteIdResolver, SiteIdResolver>();
+
+            services.TryAddSingleton<ITempDataProvider, CookieTempDataProvider>();
+            services.TryAddScoped<IRecaptchaKeysProvider, SiteRecaptchaKeysProvider>();
+
+            services.AddCloudscribeFileManagerIntegration(configuration);
 
             return services;
         }
@@ -79,15 +112,17 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="options"></param>
         /// <returns>RazorViewEngineOptions</returns>
-        public static RazorViewEngineOptions AddEmbeddedViewsForCloudscribeCore(this RazorViewEngineOptions options)
-        {
-            options.FileProviders.Add(new EmbeddedFileProvider(
-                    typeof(SiteManager).GetTypeInfo().Assembly,
-                    "cloudscribe.Core.Web"
-                ));
+        //[Obsolete("AddEmbeddedViewsForCloudscribeCore is deprecated, please use AddEmbeddedBootstrap3ViewsForCloudscribeCore instead.")]
+        //public static RazorViewEngineOptions AddEmbeddedViewsForCloudscribeCore(this RazorViewEngineOptions options)
+        //{
+        //    //options.FileProviders.Add(new EmbeddedFileProvider(
+        //    //        typeof(SiteManager).GetTypeInfo().Assembly,
+        //    //        "cloudscribe.Core.Web"
+        //    //    ));
+        //    options.AddEmbeddedBootstrap3ViewsForCloudscribeCore();
 
-            return options;
-        }
+        //    return options;
+        //}
 
         
 
@@ -102,5 +137,46 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return options;
         }
+
+        public static AuthorizationOptions AddCloudscribeCoreDefaultPolicies(this AuthorizationOptions options)
+        {
+            options.AddPolicy(
+                    "ServerAdminPolicy",
+                    authBuilder =>
+                    {
+                        authBuilder.RequireRole("ServerAdmins");
+                    });
+
+            options.AddPolicy(
+                "CoreDataPolicy",
+                authBuilder =>
+                {
+                    authBuilder.RequireRole("ServerAdmins");
+                });
+
+            options.AddPolicy(
+                "AdminPolicy",
+                authBuilder =>
+                {
+                    authBuilder.RequireRole("ServerAdmins", "Administrators");
+                });
+
+            options.AddPolicy(
+                "UserManagementPolicy",
+                authBuilder =>
+                {
+                    authBuilder.RequireRole("ServerAdmins", "Administrators");
+                });
+
+            options.AddPolicy(
+                "RoleAdminPolicy",
+                authBuilder =>
+                {
+                    authBuilder.RequireRole("Role Administrators", "Administrators");
+                });
+
+            return options;
+        }
+
     }
 }

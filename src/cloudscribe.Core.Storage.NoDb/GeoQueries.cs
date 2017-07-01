@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:                  Joe Audette
 // Created:                 2016-05-14
-// Last Modified:           2016-06-12
+// Last Modified:           2016-08-03
 // 
 
 using cloudscribe.Core.Models.Geography;
@@ -18,31 +18,31 @@ namespace cloudscribe.Core.Storage.NoDb
     public class GeoQueries : IGeoQueries
     {
         public GeoQueries(
-            IProjectResolver projectResolver,
+            //IProjectResolver projectResolver,
             IBasicQueries<GeoCountry> countryQueries,
             IBasicQueries<GeoZone> stateQueries
             )
         {
-            this.projectResolver = projectResolver;
+            //this.projectResolver = new DefaultProjectResolver();
             this.countryQueries = countryQueries;
             this.stateQueries = stateQueries;
            
         }
 
-        private IProjectResolver projectResolver;
+        //private IProjectResolver projectResolver;
         private IBasicQueries<GeoCountry> countryQueries;
         private IBasicQueries<GeoZone> stateQueries;
         
-        protected string projectId;
+        //protected string projectId;
 
-        private async Task EnsureProjectId()
-        {
-            if (string.IsNullOrEmpty(projectId))
-            {
-                projectId = await projectResolver.ResolveProjectId().ConfigureAwait(false); 
-            }
+        //private async Task EnsureProjectId()
+        //{
+        //    if (string.IsNullOrEmpty(projectId))
+        //    {
+        //        projectId = await projectResolver.ResolveProjectId().ConfigureAwait(false); 
+        //    }
 
-        }
+        //}
 
         public async Task<IGeoCountry> FetchCountry(
             Guid countryId,
@@ -51,7 +51,8 @@ namespace cloudscribe.Core.Storage.NoDb
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
 
-            await EnsureProjectId().ConfigureAwait(false);
+            //await EnsureProjectId().ConfigureAwait(false);
+            var projectId = "default";
 
             return await countryQueries.FetchAsync(
                 projectId,
@@ -66,7 +67,8 @@ namespace cloudscribe.Core.Storage.NoDb
         {
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
-            await EnsureProjectId().ConfigureAwait(false);
+            //await EnsureProjectId().ConfigureAwait(false);
+            var projectId = "default";
 
             var all = await countryQueries.GetAllAsync(projectId, cancellationToken).ConfigureAwait(false);
             var countries = all.ToList().AsQueryable();
@@ -81,7 +83,8 @@ namespace cloudscribe.Core.Storage.NoDb
         {
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
-            await EnsureProjectId().ConfigureAwait(false);
+            //await EnsureProjectId().ConfigureAwait(false);
+            var projectId = "default";
 
             var all = await countryQueries.GetAllAsync(projectId, cancellationToken).ConfigureAwait(false);
             return all.ToList().Count;
@@ -91,7 +94,8 @@ namespace cloudscribe.Core.Storage.NoDb
         { 
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
-            await EnsureProjectId().ConfigureAwait(false);
+            //await EnsureProjectId().ConfigureAwait(false);
+            var projectId = "default";
 
             var all = await countryQueries.GetAllAsync(projectId, cancellationToken).ConfigureAwait(false);
             var countries = all.ToList().AsQueryable();
@@ -112,7 +116,8 @@ namespace cloudscribe.Core.Storage.NoDb
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
 
-            await EnsureProjectId().ConfigureAwait(false);
+            //await EnsureProjectId().ConfigureAwait(false);
+            var projectId = "default";
 
             var all = await countryQueries.GetAllAsync(projectId, cancellationToken).ConfigureAwait(false);
             var countries = all.ToList().AsQueryable();
@@ -135,7 +140,9 @@ namespace cloudscribe.Core.Storage.NoDb
         {
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
-            await EnsureProjectId().ConfigureAwait(false);
+            //await EnsureProjectId().ConfigureAwait(false);
+            var projectId = "default";
+
             return await stateQueries.FetchAsync(
                 projectId,
                 stateId.ToString(),
@@ -149,7 +156,8 @@ namespace cloudscribe.Core.Storage.NoDb
         {
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
-            await EnsureProjectId().ConfigureAwait(false);
+            //await EnsureProjectId().ConfigureAwait(false);
+            var projectId = "default";
 
             var all = await stateQueries.GetAllAsync(projectId, cancellationToken).ConfigureAwait(false);
 
@@ -166,14 +174,15 @@ namespace cloudscribe.Core.Storage.NoDb
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
 
-            await EnsureProjectId().ConfigureAwait(false);
+            //await EnsureProjectId().ConfigureAwait(false);
+            var projectId = "default";
 
             var all = await stateQueries.GetAllAsync(projectId, cancellationToken).ConfigureAwait(false);
             var states = all.ToList().AsQueryable();
 
             var query = states
                         .Where(x => x.CountryId == countryId)
-                        .OrderByDescending(x => x.Name)
+                        .OrderBy(x => x.Name)
                         .Select(x => x);
 
             return  query.ToList<IGeoZone>();
@@ -188,7 +197,8 @@ namespace cloudscribe.Core.Storage.NoDb
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
 
-            await EnsureProjectId().ConfigureAwait(false);
+            //await EnsureProjectId().ConfigureAwait(false);
+            var projectId = "default";
 
             var all = await countryQueries.GetAllAsync(projectId, cancellationToken).ConfigureAwait(false);
             var countries = all.ToList().AsQueryable();
@@ -215,7 +225,8 @@ namespace cloudscribe.Core.Storage.NoDb
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
 
-            await EnsureProjectId().ConfigureAwait(false);
+            //await EnsureProjectId().ConfigureAwait(false);
+            var projectId = "default";
 
             var all = await stateQueries.GetAllAsync(projectId, cancellationToken).ConfigureAwait(false);
             var states = all.ToList().AsQueryable();
@@ -223,7 +234,7 @@ namespace cloudscribe.Core.Storage.NoDb
             var listQuery = states
                             .Where(x =>
                            x.CountryId == countryId &&
-                           (x.Name.Contains(query) || x.Code.Contains(query))
+                           ( x.Code.Contains(query))
                             )
                             .OrderBy(x => x.Code)
                             .Take(maxRows)
@@ -242,7 +253,8 @@ namespace cloudscribe.Core.Storage.NoDb
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
 
-            await EnsureProjectId().ConfigureAwait(false);
+            //await EnsureProjectId().ConfigureAwait(false);
+            var projectId = "default";
 
             var all = await stateQueries.GetAllAsync(projectId, cancellationToken).ConfigureAwait(false);
             var states = all.ToList().AsQueryable();

@@ -9,8 +9,6 @@ using System;
 
 namespace cloudscribe.Core.Models
 {
-
-    //[Serializable]
     public class SiteUser : UserInfo, ISiteUser
     {
         
@@ -44,7 +42,11 @@ namespace cloudscribe.Core.Models
 
         
         public bool EmailConfirmed { get; set; } = false;
-        
+
+        public DateTime? EmailConfirmSentUtc { get; set; } = null;
+
+        public DateTime? AgreementAcceptedUtc { get; set; } = null;
+
         public DateTime? LockoutEndDateUtc { get; set; } = null;
 
         private string newEmail = string.Empty;
@@ -158,6 +160,8 @@ namespace cloudscribe.Core.Models
             
             u.UserName = user.UserName;
             u.WebSiteUrl = user.WebSiteUrl;
+            u.EmailConfirmSentUtc = user.EmailConfirmSentUtc;
+            u.AgreementAcceptedUtc = user.AgreementAcceptedUtc;
            
 
             return u;

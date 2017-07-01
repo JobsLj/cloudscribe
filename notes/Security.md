@@ -1,6 +1,57 @@
 
 
+http://jameschambers.com/2016/04/github-authentication-asp-net-core/
+https://developer.github.com/v3/guides/getting-started/
+https://github.com/aspnet-contrib/AspNet.Security.OAuth.Providers/tree/dev/src/AspNet.Security.OAuth.GitHub
+
+https://stackoverflow.com/questions/41242442/how-to-implement-windows-authentication-with-identityserver-4
+
+https://paragonie.com/blog/2017/03/jwt-json-web-tokens-is-bad-standard-that-everyone-should-avoid
+
+https://blogs.msdn.microsoft.com/webdev/2017/04/06/jwt-validation-and-authorization-in-asp-net-core/
+
+https://blogs.msdn.microsoft.com/webdev/2017/04/27/jwt-validation-and-authorization-in-asp-net-core-2/
+
+https://arstechnica.co.uk/security/2017/02/now-sites-can-fingerprint-you-online-even-when-you-use-multiple-browsers/
+
+https://blog.benroux.me/running-multiple-https-domains-from-the-same-server/
+
+http://odetocode.com/blogs/scott/archive/2017/02/06/anti-forgery-tokens-and-asp-net-core-apis.aspx
+
+http://sakurity.com/blog/2016/12/10/serviceworker_botnet.html
+
+https://docs.microsoft.com/en-us/aspnet/core/hosting/dataprotection
+To automatically persist keys for an application hosted in IIS, you must create registry hives for each application pool. Use the Provisioning PowerShell script for each application pool you will be hosting ASP.NET Core applications under. This script will create a special registry key in the HKLM registry that is ACLed only to the worker process account. Keys are encrypted at rest using DPAPI.
+https://github.com/aspnet/DataProtection/blob/dev/Provision-AutoGenKeys.ps1
+
+https://blogs.msdn.microsoft.com/webdev/2016/10/27/bearer-token-authentication-in-asp-net-core/
+
+
+http://en.xn--mgbz4cf.com/post/secure-your-aspnet-core-application-from-image-hotlinking
+
+http://blog.securityps.com/2016/08/aspnet-core-basic-security-settings.html
+
+https://www.smashingmagazine.com/2016/09/content-security-policy-your-future-best-friend/
+
+http://andrewlock.net/exploring-the-cookieauthenticationmiddleware-in-asp-net-core/
+
+http://andrewlock.net/a-look-behind-the-jwt-bearer-authentication-middleware-in-asp-net-core/
+
+http://andrewlock.net/a-look-behind-the-jwt-bearer-authentication-middleware-in-asp-net-core/
+
+http://en.هشام.com/post/secure-your-aspnet-core-application-from-image-hotlinking
+
+https://dev.to/ben/the-targetblank-vulnerability-by-example
+
+https://blog.mariusschulz.com/2016/07/19/securing-authentication-cookies-in-asp-net-core
+
 http://stackoverflow.com/questions/35307143/simple-jwt-authentication-in-asp-net-core-1-0-web-api
+
+## Authorization
+https://blogs.msdn.microsoft.com/webdev/2016/03/15/get-started-with-asp-net-core-authorization-part-1-of-2/
+https://blogs.msdn.microsoft.com/webdev/2016/03/23/get-started-with-asp-net-core-authorization-part-2-of-2/
+
+http://benjamincollins.com/blog/practical-permission-based-authorization-in-asp-net-core/
 
 https://goblincoding.com/2016/07/03/issuing-and-authenticating-jwt-tokens-in-asp-net-core-webapi-part-i/
 https://goblincoding.com/2016/07/07/issuing-and-authenticating-jwt-tokens-in-asp-net-core-webapi-part-ii/
@@ -207,3 +258,27 @@ http://blogs.msdn.com/b/webdev/archive/2014/01/06/implementing-custom-password-p
 http://stackoverflow.com/questions/31476361/sharing-authentication-cookie-in-asp-net-5-across-subdomains
 
 http://stackoverflow.com/questions/30768015/configure-the-authorization-server-endpoint
+
+
+http://www.asp.net/aspnet/overview/web-development-best-practices/what-not-to-do-in-aspnet-and-what-to-do-instead#validation
+
+using openidconnect in cloudscribe against identity server-endpoint
+in the op server setup the client
+Allow access tokens via the browser 
+
+add redirect url:
+https://localhost:44399/signin-oidc 
+
+https://localhost:44399/two/signin-oidc
+add logout redirect url
+https://localhost:44399/signout-callback-oidc 
+
+https://localhost:44399/two/signout-callback-oidc
+add cors origin:
+https://localhost:44399 
+add client secret, only value is needed
+allowed grant types use hybrid
+add allowed scopes
+openid and profile which also must be created as identoty resources
+
+optional add scopes for protected resource apis if applicable

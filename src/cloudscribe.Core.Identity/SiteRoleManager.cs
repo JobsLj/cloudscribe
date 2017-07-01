@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:				    2014-07-17
-// Last Modified:		    2016-05-18
+// Last Modified:		    2016-12-07
 // 
 //
 
@@ -26,7 +26,7 @@ namespace cloudscribe.Core.Identity
     public class SiteRoleManager<TRole> : RoleManager<TRole> where TRole : SiteRole
     {
         public SiteRoleManager(
-            SiteSettings currentSite,
+            SiteContext currentSite,
             IUserCommands userCommands,
             IUserQueries userQueries,
             IOptions<MultiTenantOptions> multiTenantOptionsAccessor,
@@ -66,8 +66,8 @@ namespace cloudscribe.Core.Identity
         private IUserCommands commands;
         private IUserQueries queries;
         private ILogger logger;
-        private ISiteSettings siteSettings = null;
-        private ISiteSettings Site
+        private ISiteContext siteSettings = null;
+        private ISiteContext Site
         {
             get
             {
@@ -98,12 +98,18 @@ namespace cloudscribe.Core.Identity
         
         public async Task DeleteUserRolesByRole(Guid roleId)
         {
-            await commands.DeleteUserRolesByRole(roleId, CancellationToken);
+            var siteId = Site.Id;
+            if (multiTenantOptions.UseRelatedSitesMode) { siteId = multiTenantOptions.RelatedSiteId; }
+
+            await commands.DeleteUserRolesByRole(siteId, roleId, CancellationToken);
         }
 
         public async Task DeleteRole(Guid roleId)
         {
-            await commands.DeleteRole(roleId, CancellationToken);
+            var siteId = Site.Id;
+            if (multiTenantOptions.UseRelatedSitesMode) { siteId = multiTenantOptions.RelatedSiteId; }
+
+            await commands.DeleteRole(siteId, roleId, CancellationToken);
         }
 
         //public async Task<bool> RoleExists(Guid siteId, string roleName)
@@ -163,7 +169,7 @@ namespace cloudscribe.Core.Identity
             if (role == null) { throw new ArgumentNullException(nameof(role)); }
             if(role.SiteId != user.SiteId) { throw new ArgumentException("user and role must have the same siteid"); }
 
-            await commands.AddUserToRole(role.Id, user.Id, CancellationToken);
+            await commands.AddUserToRole(role.SiteId, role.Id, user.Id, CancellationToken);
             
             user.RolesChanged = true;
             await commands.Update(user, CancellationToken);
@@ -176,7 +182,7 @@ namespace cloudscribe.Core.Identity
             if (user == null) { throw new ArgumentNullException(nameof(user)); }
             if (role == null) { throw new ArgumentNullException(nameof(role)); }
 
-            await commands.RemoveUserFromRole(role.Id, user.Id, CancellationToken);
+            await commands.RemoveUserFromRole(role.SiteId, role.Id, user.Id, CancellationToken);
             
             user.RolesChanged = true;
             await commands.Update(user, CancellationToken);

@@ -1,4 +1,6 @@
 
+http://benjii.me/2016/08/global-routes-for-asp-net-core-mvc/
+
 http://www.codeproject.com/Articles/1110613/Understanding-Routing-Precedence-in-ASP-NET-MVC-an
 
 http://mobilemancer.com/2016/07/06/how-to-master-asp-net-core-web-api-attribute-routing/
@@ -26,3 +28,5 @@ http://stackoverflow.com/questions/32582232/imlementing-a-custom-irouter-in-asp-
 http://stackoverflow.com/questions/32565768/change-route-collection-of-mvc6-after-startup#32586837
 
 http://www.hanselman.com/blog/AddingACustomInlineRouteConstraintInASPNETCore10.aspx
+
+http://www.strathweb.com/2016/04/request-islocal-in-asp-net-core/

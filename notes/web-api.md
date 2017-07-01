@@ -1,4 +1,28 @@
 
+
+https://codeopinion.com/building-self-descriptive-http-api-asp-net-core/
+https://codeopinion.com/self-descriptive-http-api-in-asp-net-core-object-as-resource/
+https://codeopinion.com/self-descriptive-http-api-in-asp-net-core-hypermedia/
+https://codeopinion.com/self-descriptive-http-api-in-asp-net-core-hateoas/
+
+https://github.com/dcomartin/Migrap.AspNetCore.Hateoas
+
+http://hyperschema.org/mediatypes/siren
+
+https://www.markus-lanthaler.com/hydra/
+
+
+
+
+
+https://tomhofman.nl/lets-create-versioned-documented-asp-net-core-web-api/
+
+https://andrewlock.net/model-binding-json-posts-in-asp-net-core/
+
+https://www.smashingmagazine.com/2017/04/guide-http2-server-push/
+
+http://www.dotnetcurry.com/aspnet-mvc/1149/convert-aspnet-webapi2-aspnet5-mvc6
+
 https://goblincoding.com/2016/07/03/issuing-and-authenticating-jwt-tokens-in-asp-net-core-webapi-part-i/
 
 https://goblincoding.com/2016/07/07/issuing-and-authenticating-jwt-tokens-in-asp-net-core-webapi-part-ii/

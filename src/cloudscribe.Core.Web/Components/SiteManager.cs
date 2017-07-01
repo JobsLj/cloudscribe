@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2015-07-22
-// Last Modified:			2016-06-11
+// Last Modified:			2016-12-07
 // 
 
 using cloudscribe.Core.Models;
@@ -20,7 +20,8 @@ namespace cloudscribe.Core.Web.Components
     {
 
         public SiteManager(
-            SiteSettings currentSite,
+            SiteContext currentSite,
+            SiteEvents siteEventHandlers,
             ISiteCommands siteCommands,
             ISiteQueries siteQueries,
             IUserCommands userCommands,
@@ -47,6 +48,7 @@ namespace cloudscribe.Core.Web.Components
             //resolver = siteResolver;
             siteSettings = currentSite;
             this.cacheHelper = cacheHelper;
+            eventHandlers = siteEventHandlers;
         }
 
         private readonly HttpContext _context;
@@ -60,7 +62,8 @@ namespace cloudscribe.Core.Web.Components
         private ISiteQueries queries;
         private IUserQueries userQueries;
         private IUserCommands userCommands;
-        private ISiteSettings siteSettings = null;
+        private ISiteContext siteSettings = null;
+        private SiteEvents eventHandlers;
         //private ISiteSettings Site
         //{
         //    get
@@ -69,11 +72,48 @@ namespace cloudscribe.Core.Web.Components
         //    }
         //}
 
-        public ISiteSettings CurrentSite
+        public ISiteContext CurrentSite
         {
             get { return siteSettings; }
         }
-        
+
+        public async Task<ISiteSettings> GetCurrentSiteSettings()
+        {
+            return await queries.Fetch(CurrentSite.Id, CancellationToken);
+        }
+
+        public async Task<ISiteContext> GetSiteForDataOperations(Guid? siteId, bool useRelatedSiteId = false)
+        {
+            if(multiTenantOptions.UseRelatedSitesMode)
+            {
+                if (useRelatedSiteId)
+                {
+                    return await Fetch(multiTenantOptions.RelatedSiteId) as ISiteContext;
+                }
+            }
+
+            if ((siteId.HasValue) && (siteId.Value != Guid.Empty) 
+                && (siteId.Value != CurrentSite.Id) 
+                && (CurrentSite.IsServerAdminSite))
+            {
+                return await Fetch(siteId.Value) as ISiteContext; 
+            }
+
+            return CurrentSite;
+        }
+
+        public async Task<ISiteSettings> GetSiteForEdit(Guid? siteId)
+        {
+            if ((siteId.HasValue) && (siteId.Value != Guid.Empty)
+                && (siteId.Value != CurrentSite.Id)
+                && (CurrentSite.IsServerAdminSite))
+            {
+                return await Fetch(siteId.Value);
+            }
+
+            return await Fetch(CurrentSite.Id);
+        }
+
         public Task<List<ISiteInfo>> GetPageOtherSites(
             Guid currentSiteId,
             int pageNumber,
@@ -137,6 +177,8 @@ namespace cloudscribe.Core.Web.Components
 
         public async Task Update(ISiteSettings site)
         {
+            await eventHandlers.HandleSitePreUpdate(site.Id).ConfigureAwait(false);
+
             dataProtector.Protect(site);
             if(site.Id == Guid.Empty)
             {
@@ -163,16 +205,13 @@ namespace cloudscribe.Core.Web.Components
                 if(_context != null && !string.IsNullOrEmpty(_context.Request.Host.Value))
                 cacheHelper.ClearCache(_context.Request.Host.Value);
             }
+
+            await eventHandlers.HandleSiteUpdated(site).ConfigureAwait(false);
         }
 
         public async Task Delete(ISiteSettings site)
         {
-            // we will need a provider model or something similar here to
-            // allow other features and 3rd party features to delete
-            // related data when a site is deleted
-            // TODO: implement
-            // will ProviderModel be available in Core Framework or will we have to use something else
-            // a way to use dependency injection?
+            await eventHandlers.HandleSitePreDelete(site.Id).ConfigureAwait(false);
 
             // delete users
             await userCommands.DeleteUsersBySite(site.Id, CancellationToken.None); // this also deletes userroles claims logins
@@ -206,7 +245,7 @@ namespace cloudscribe.Core.Web.Components
             newSite.SiteName = "Sample Site";
             newSite.IsServerAdminSite = isServerAdminSite;
             var siteNumber = 1 + await queries.CountOtherSites(Guid.Empty);
-            newSite.AliasId = $"site-{siteNumber}";
+            newSite.AliasId = $"s{siteNumber}";
 
             await CreateNewSite(newSite);
             
@@ -223,6 +262,8 @@ namespace cloudscribe.Core.Web.Components
 
             if(multiTenantOptions.Mode == MultiTenantMode.FolderName)
             cacheHelper.ClearCache("folderList");
+
+            await eventHandlers.HandleSiteCreated(newSite).ConfigureAwait(false);
 
         }
 
@@ -260,6 +301,7 @@ namespace cloudscribe.Core.Web.Components
             await userCommands.Create(adminUser, CancellationToken.None);
 
             await userCommands.AddUserToRole(
+                site.Id,
                 adminRole.Id,
                 adminUser.Id,
                 CancellationToken.None);
@@ -313,6 +355,7 @@ namespace cloudscribe.Core.Web.Components
             await userCommands.Create(adminUser, CancellationToken.None);
             
             await userCommands.AddUserToRole(
+                site.Id,
                 adminRole.Id,
                 adminUser.Id,
                 CancellationToken.None);
@@ -379,9 +422,9 @@ namespace cloudscribe.Core.Web.Components
             await commands.AddHost(siteId, hostName, CancellationToken);
         }
 
-        public async Task DeleteHost(Guid hostId)
+        public async Task DeleteHost(Guid siteId, Guid hostId)
         {
-            await commands.DeleteHost(hostId, CancellationToken);
+            await commands.DeleteHost(siteId, hostId, CancellationToken);
         }
 
         public Task<int> GetUserCount(Guid siteId)

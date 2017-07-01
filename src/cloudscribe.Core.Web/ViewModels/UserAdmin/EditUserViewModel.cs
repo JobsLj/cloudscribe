@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:				    2014-08-31
-// Last Modified:		    2016-06-21
+// Last Modified:		    2017-06-09
 // 
 // TODO: support custom profile properties that are required for registration ?
 
@@ -12,7 +12,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-
+using System.Security.Claims;
 
 namespace cloudscribe.Core.Web.ViewModels.Account
 {
@@ -21,6 +21,7 @@ namespace cloudscribe.Core.Web.ViewModels.Account
         public EditUserViewModel()
         {
             AllTimeZones = new List<SelectListItem>();
+            UserClaims = new List<Claim>();
         }
         
         public Guid UserId { get; set; } = Guid.Empty;
@@ -64,6 +65,7 @@ namespace cloudscribe.Core.Web.ViewModels.Account
         
         public string Comment { get; set; }
 
-
+        public IList<Claim> UserClaims { get; set; }
+        
     }
 }

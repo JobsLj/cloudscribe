@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2014-10-26
-// Last Modified:			2016-06-14
+// Last Modified:			2017-06-29
 // 
 
 using System;
@@ -61,24 +61,36 @@ namespace cloudscribe.Core.Web.ViewModels.SiteSettings
         [Remote("HostNameAvailable", "SiteAdmin", AdditionalFields = "SiteId",
            ErrorMessage = "Requested Host name is not available",
            HttpMethod = "Post")]
-        [RegularExpression(@"^[a-zA-Z0-9_-]+$", ErrorMessage = "For Host name, only digits, numbers, - and _ allowed, no spaces allowed")]
+        [RegularExpression(@"^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$", ErrorMessage = "Host name is not valid.")]
         [StringLength(255, ErrorMessage = "Host name has a maximum length of 255 characters")]
         public string HostName { get; set; } = string.Empty;
         
         public string Theme { get; set; } = string.Empty;
-
-        public List<SelectListItem> AvailableThemes { get; set; } = null;
         
+        public List<SelectListItem> AvailableThemes { get; set; } = null;
+
+        [StringLength(255, ErrorMessage = "Google Analytics ProfileId has a maximum length of 25 characters")]
+        public string GoogleAnalyticsProfileId { get; set; }
+
 
         [Required(ErrorMessage = "Time zone is required")]
         public string TimeZoneId { get; set; } = "America/New_York";
         
         public IEnumerable<SelectListItem> AllTimeZones { get; set; } = null;
-        
+
+        public List<SelectListItem> AvailableCultures { get; set; } = null;
+        public string ForcedCulture { get; set; } = string.Empty;
+
+        public string ForcedUICulture { get; set; } = string.Empty;
+
+        public List<SelectListItem> AvailableUICultures { get; set; } = null;
+
         public int ReturnPageNumber { get; set; } = 1;
         public bool ShowDelete { get; set; } = false;
         public string ClosedMessage { get; set; } = string.Empty;
         public bool IsClosed { get; set; } = false;
-            
+
+        
+
     }
 }

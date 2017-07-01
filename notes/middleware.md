@@ -1,7 +1,13 @@
 
+http://www.talkingdotnet.com/how-to-enable-gzip-compression-in-asp-net-core/
+
+https://carlos.mendible.com/2017/02/12/net-core-health-endpoint-monitoring-middleware/
+
 http://docs.asp.net/en/latest/fundamentals/middleware.html
 
 https://www.jeffogata.com/asp-net-core-middleware/
+
+https://www.billboga.com/posts/using-aspnet-cores-middleware-to-modify-response-body
 
 https://github.com/ClintBailiff/MiddlewareDemo
 http://odetocode.com/blogs/scott/archive/2015/10/06/authorization-policies-and-middleware-in-asp-net-5.aspx

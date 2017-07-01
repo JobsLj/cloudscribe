@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2015-08-11
-// Last Modified:			2016-06-24
+// Last Modified:			2017-05-23
 // 
 
 using cloudscribe.Core.Models;
@@ -10,6 +10,7 @@ using cloudscribe.Messaging.Email;
 using cloudscribe.Web.Common.Razor;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Threading.Tasks;
 
@@ -23,6 +24,8 @@ namespace cloudscribe.Core.Web.Components.Messaging
 
         public SiteEmailMessageSender(
             ViewRenderer viewRenderer,
+            ISmtpOptionsProvider smtpOptionsProvider,
+            //IOptions<SmtpOptions> smtpOptionsAccessor,
             IStringLocalizer<CloudscribeCore> localizer,
             ILogger<SiteEmailMessageSender> logger
             )
@@ -30,36 +33,43 @@ namespace cloudscribe.Core.Web.Components.Messaging
             log = logger;
             sr = localizer;
             this.viewRenderer = viewRenderer;
+            this.smtpOptionsProvider = smtpOptionsProvider;
+            //globalSmtpSettings = smtpOptionsAccessor.Value;
 
         }
 
         private ViewRenderer viewRenderer;
+        private ISmtpOptionsProvider smtpOptionsProvider;
+        //private SmtpOptions globalSmtpSettings;
         private IStringLocalizer sr;
         private ILogger log;
 
-        private SmtpOptions GetSmptOptions(ISiteSettings siteSettings)
+        private async Task<SmtpOptions> GetSmptOptions()
         {
-            if (string.IsNullOrWhiteSpace(siteSettings.SmtpServer)) { return null; }
+            return await smtpOptionsProvider.GetSmtpOptions().ConfigureAwait(false);
+            //if(!siteSettings.SmtpIsConfigured()) { return globalSmtpSettings; }
 
-            SmtpOptions smtpOptions = new SmtpOptions();
-            smtpOptions.Password = siteSettings.SmtpPassword;
-            smtpOptions.Port = siteSettings.SmtpPort;
-            smtpOptions.PreferredEncoding = siteSettings.SmtpPreferredEncoding;
-            smtpOptions.RequiresAuthentication = siteSettings.SmtpRequiresAuth;
-            smtpOptions.Server = siteSettings.SmtpServer;
-            smtpOptions.User = siteSettings.SmtpUser;
-            smtpOptions.UseSsl = siteSettings.SmtpUseSsl;
+            //SmtpOptions smtpOptions = new SmtpOptions();
+            //smtpOptions.Password = siteSettings.SmtpPassword;
+            //smtpOptions.Port = siteSettings.SmtpPort;
+            //smtpOptions.PreferredEncoding = siteSettings.SmtpPreferredEncoding;
+            //smtpOptions.RequiresAuthentication = siteSettings.SmtpRequiresAuth;
+            //smtpOptions.Server = siteSettings.SmtpServer;
+            //smtpOptions.User = siteSettings.SmtpUser;
+            //smtpOptions.UseSsl = siteSettings.SmtpUseSsl;
+            //smtpOptions.DefaultEmailFromAddress = siteSettings.DefaultEmailFromAddress;
+            //smtpOptions.DefaultEmailFromAlias = siteSettings.DefaultEmailFromAlias;
 
-            return smtpOptions;
+            //return smtpOptions;
         }
 
         public async Task SendAccountConfirmationEmailAsync(
-            ISiteSettings siteSettings,
+            ISiteContext siteSettings,
             string toAddress,
             string subject,
             string confirmationUrl)
         {
-            SmtpOptions smtpOptions = GetSmptOptions(siteSettings);
+            var smtpOptions = await GetSmptOptions().ConfigureAwait(false);
             if (smtpOptions == null)
             {
                 var logMessage = $"failed to send account confirmation email because smtp settings are not populated for site {siteSettings.SiteName}";
@@ -67,7 +77,7 @@ namespace cloudscribe.Core.Web.Components.Messaging
                 return;
             }
             
-            EmailSender sender = new EmailSender();
+            var sender = new EmailSender();
             try
             {
                 var plainTextMessage
@@ -79,7 +89,7 @@ namespace cloudscribe.Core.Web.Components.Messaging
                 await sender.SendEmailAsync(
                     smtpOptions,
                     toAddress,
-                    siteSettings.DefaultEmailFromAddress,
+                    smtpOptions.DefaultEmailFromAddress,
                     subject,
                     plainTextMessage,
                     htmlMessage).ConfigureAwait(false);
@@ -92,12 +102,12 @@ namespace cloudscribe.Core.Web.Components.Messaging
         }
 
         public async Task SendPasswordResetEmailAsync(
-            ISiteSettings siteSettings,
+            ISiteContext siteSettings,
             string toAddress,
             string subject,
             string resetUrl)
         {
-            SmtpOptions smtpOptions = GetSmptOptions(siteSettings);
+            var smtpOptions = await GetSmptOptions().ConfigureAwait(false);
 
             if (smtpOptions == null)
             {
@@ -106,7 +116,7 @@ namespace cloudscribe.Core.Web.Components.Messaging
                 return;
             }
             
-            EmailSender sender = new EmailSender();
+            var sender = new EmailSender();
             // in account controller we are calling this method without await
             // so it doesn't block the UI. Which means it is running on a background thread
             // similar as the old ThreadPool.QueueWorkItem
@@ -123,7 +133,7 @@ namespace cloudscribe.Core.Web.Components.Messaging
                 await sender.SendEmailAsync(
                     smtpOptions,
                     toAddress,
-                    siteSettings.DefaultEmailFromAddress,
+                    smtpOptions.DefaultEmailFromAddress,
                     subject,
                     plainTextMessage,
                     htmlMessage).ConfigureAwait(false);
@@ -136,12 +146,12 @@ namespace cloudscribe.Core.Web.Components.Messaging
         }
 
         public async Task SendSecurityCodeEmailAsync(
-            ISiteSettings siteSettings,
+            ISiteContext siteSettings,
             string toAddress,
             string subject,
             string securityCode)
         {
-            SmtpOptions smtpOptions = GetSmptOptions(siteSettings);
+            var smtpOptions = await GetSmptOptions().ConfigureAwait(false);
 
             if (smtpOptions == null)
             {
@@ -150,7 +160,7 @@ namespace cloudscribe.Core.Web.Components.Messaging
                 return;
             }
             
-            EmailSender sender = new EmailSender();
+            var sender = new EmailSender();
             try
             {
                 var plainTextMessage
@@ -162,7 +172,7 @@ namespace cloudscribe.Core.Web.Components.Messaging
                 await sender.SendEmailAsync(
                 smtpOptions,
                 toAddress,
-                siteSettings.DefaultEmailFromAddress,
+                smtpOptions.DefaultEmailFromAddress,
                 subject,
                 plainTextMessage,
                 htmlMessage).ConfigureAwait(false);
@@ -174,12 +184,12 @@ namespace cloudscribe.Core.Web.Components.Messaging
         }
 
         public async Task AccountPendingApprovalAdminNotification(
-            ISiteSettings siteSettings,
-            ISiteUser user)
+            ISiteContext siteSettings,
+            IUserContext user)
         {
             if (siteSettings.AccountApprovalEmailCsv.Length == 0) { return; }
 
-            SmtpOptions smtpOptions = GetSmptOptions(siteSettings);
+            var smtpOptions = await GetSmptOptions().ConfigureAwait(false);
 
             if (smtpOptions == null)
             {
@@ -190,19 +200,19 @@ namespace cloudscribe.Core.Web.Components.Messaging
 
             string subject = sr["New Account Pending Approval"];
            
-            EmailSender sender = new EmailSender();
+            var sender = new EmailSender();
             try
             {
                 var plainTextMessage
-                   = await viewRenderer.RenderViewAsString<ISiteUser>("EmailTemplates/AccountPendingApprovalAdminNotificationTextEmail", user).ConfigureAwait(false);
+                   = await viewRenderer.RenderViewAsString<IUserContext>("EmailTemplates/AccountPendingApprovalAdminNotificationTextEmail", user).ConfigureAwait(false);
 
                 var htmlMessage
-                    = await viewRenderer.RenderViewAsString<ISiteUser>("EmailTemplates/AccountPendingApprovalAdminNotificationHtmlEmail", user).ConfigureAwait(false);
+                    = await viewRenderer.RenderViewAsString<IUserContext>("EmailTemplates/AccountPendingApprovalAdminNotificationHtmlEmail", user).ConfigureAwait(false);
 
                 await sender.SendMultipleEmailAsync(
                     smtpOptions,
                     siteSettings.AccountApprovalEmailCsv,
-                    siteSettings.DefaultEmailFromAddress,
+                    smtpOptions.DefaultEmailFromAddress,
                     subject,
                     plainTextMessage,
                     htmlMessage).ConfigureAwait(false);
@@ -215,12 +225,12 @@ namespace cloudscribe.Core.Web.Components.Messaging
         }
 
         public async Task SendAccountApprovalNotificationAsync(
-            ISiteSettings siteSettings,
+            ISiteContext siteSettings,
             string toAddress,
             string subject,
             string loginUrl)
         {
-            SmtpOptions smtpOptions = GetSmptOptions(siteSettings);
+            var smtpOptions = await GetSmptOptions().ConfigureAwait(false);
 
             if (smtpOptions == null)
             {
@@ -229,7 +239,7 @@ namespace cloudscribe.Core.Web.Components.Messaging
                 return;
             }
             
-            EmailSender sender = new EmailSender();
+            var sender = new EmailSender();
             // in account controller we are calling this method without await
             // so it doesn't block the UI. Which means it is running on a background thread
             // similar as the old ThreadPool.QueueWorkItem
@@ -246,7 +256,7 @@ namespace cloudscribe.Core.Web.Components.Messaging
                 await sender.SendEmailAsync(
                     smtpOptions,
                     toAddress,
-                    siteSettings.DefaultEmailFromAddress,
+                    smtpOptions.DefaultEmailFromAddress,
                     subject,
                     plainTextMessage,
                     htmlMessage).ConfigureAwait(false);
