@@ -1,7 +1,18 @@
 
 https://javascriptweblog.wordpress.com/2011/05/31/a-fresh-look-at-javascript-mixins/
 
+Why is bower still in use when they clearly state we should move to yarn/webpack?
+https://github.com/aspnet/Home/issues/2086
+
+Build Web Apps Without All That JavaScript
+https://visualstudiomagazine.com/articles/2017/05/01/build-web-apps.aspx
+
+Best Practices for javascript projects
+https://github.com/wearehive/project-guidelines
+
 https://medium.com/@alexdixon/functional-programming-in-javascript-is-an-antipattern-58526819f21e
+
+https://hackernoon.com/6-reasons-why-javascripts-async-await-blows-promises-away-tutorial-c7ec10518dd9
 
 JavaScript Patterns for 2017 - Scott Allen
 https://www.youtube.com/watch?v=hO7mzO83N1Q
@@ -75,3 +86,29 @@ http://lucasfcosta.com/2017/05/08/All-About-Recursion-PTC-TCO-and-STC-in-JavaScr
 ## Testing
 
 https://sean.is/writing/client-side-testing-with-mocha-and-karma/
+
+## Unobtrusive validation examples
+
+<input class="form-control" type="text" 
+data-val="true" 
+data-val-length="Site Folder name has a maximum length of 50 characters" 
+data-val-length-max="50" 
+data-val-regex="For Site Folder Name, only digits, numbers, - and _ allowed, no spaces allowed" 
+data-val-regex-pattern="^[a-zA-Z0-9_-]&#x2B;$" 
+data-val-remote="Requested Site Folder Name is not available, please try another value" 
+data-val-remote-additionalfields="*.SiteFolderName,*.SiteId" 
+data-val-remote-type="Post" 
+data-val-remote-url="/siteadmin/foldernameavailable" id="SiteFolderName" 
+name="SiteFolderName" 
+value="" />
+<span class="text-danger field-validation-valid" data-valmsg-for="SiteFolderName" data-valmsg-replace="true"></span> 
+<span class="field-validation-valid text-danger" data-valmsg-for="foldererror" data-valmsg-replace="true"></span>
+
+<input class="form-control" type="text" 
+data-val="true" 
+data-val-length="Site Name has a maximum length of 255 characters" 
+data-val-length-max="255" 
+data-val-required="Site Name is required" id="SiteName" name="SiteName" value="Sample Site" />
+<span class="text-danger field-validation-valid" data-valmsg-for="SiteName" data-valmsg-replace="true"></span> 
+
+

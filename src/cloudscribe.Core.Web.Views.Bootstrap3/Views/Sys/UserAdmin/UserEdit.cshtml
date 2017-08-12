@@ -10,7 +10,7 @@
     var ckOptions = await editorOptionsResolver.GetCkeditorOptions();
 }
 @section Styles {
-@{ await Html.RenderPartialAsync("_DatePickerCssPartial"); }
+    @{await Html.RenderPartialAsync("UserEditStylePartial"); }
 }
 <h2>@ViewData["Title"]</h2>
 @if (Model.UserId != Guid.Empty && !Model.AccountApproved)
@@ -82,9 +82,10 @@
                            data-bs-datepicker-debug="false"
                            data-bs-datepicker-keepOpen="false"
                            data-bs-datepicker-allowInputToggle="true"
-                           data-bs-datepicker-format="L"
                            data-bs-datepicker-viewMode="years"
                            data-bs-datepicker-usecurrent="false"
+                           data-bs-datepicker-format="L"
+                           data-bs-datepicker-locale="@System.Globalization.CultureInfo.CurrentCulture.Name"
                            data-bs-datepicker-mindate="@DateTime.UtcNow.AddYears(-120).ToString("O")"
                            data-bs-datepicker-maxdate="@DateTime.UtcNow.AddYears(-10).ToString("O")"
                            data-bs-datepicker-viewDate="@DateTime.UtcNow.AddYears(-10).ToString("O")"
@@ -98,6 +99,12 @@
                     <select asp-for="TimeZoneId"
                             asp-items="Model.AllTimeZones" class="form-control"></select>
                     <span asp-validation-for="TimeZoneId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="WebSiteUrl" class="col-md-2 control-label">@sr["Website Url"]</label>
+                <div class="col-md-10">
+                    <input asp-for="WebSiteUrl" class="form-control" />
                 </div>
             </div>
             <div class="form-group">
@@ -130,6 +137,8 @@
                           data-ckeditor-config-imagebrowseurl="@ckOptions.ImageBrowseUrl"></textarea>
                 </div>
             </div>
+
+            @{await Html.RenderPartialAsync("UserEditMiddlePartial", Model); }
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">
                     <input type="submit" class="btn btn-default" value='@sr["Save"]' />
@@ -155,8 +164,6 @@
 <div class="col-md-offset-2 col-md-10">
     @{ await Html.RenderPartialAsync("UserClaims", Model); }
 </div>
-    @section Scripts {
-        @{ await Html.RenderPartialAsync("_UnobtrusiveValidationScriptsPartial"); }
-        @{ await Html.RenderPartialAsync("_UnobtrusiveEditorScriptsPartial"); }
-        @{ await Html.RenderPartialAsync("_DatePickerScriptsPartial"); }
-    }
+@section Scripts {
+    @{await Html.RenderPartialAsync("UserEditScriptsPartial"); }
+}

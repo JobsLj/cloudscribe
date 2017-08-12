@@ -2,15 +2,18 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2017-05-22
-// Last Modified:			2017-07-01
+// Last Modified:			2017-07-14
 // 
 
 using cloudscribe.Core.Identity;
 using cloudscribe.Core.Models;
+using cloudscribe.Core.Web.ExtensionPoints;
 using cloudscribe.Core.Web.ViewModels.Account;
 using cloudscribe.Core.Web.ViewModels.SiteUser;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +39,8 @@ namespace cloudscribe.Core.Web.Components
             this.identityServerIntegration = identityServerIntegration;
             this.socialAuthEmailVerificationPolicy = socialAuthEmailVerificationPolicy;
             this.loginRulesProcessor = loginRulesProcessor;
-           
+            
+
             //log = logger;
         }
 
@@ -160,6 +164,11 @@ namespace cloudscribe.Core.Web.Components
                 );
 
         }
+
+        //public bool IsValidPassowrd(string password)
+        //{
+        //    return passwordValidator.
+        //}
         
         public async Task<UserLoginResult> TryLogin(LoginViewModel model)
         {
@@ -226,7 +235,12 @@ namespace cloudscribe.Core.Web.Components
         }
 
         
-        public async Task<UserLoginResult> TryRegister(RegisterViewModel model)
+        public async Task<UserLoginResult> TryRegister(
+            RegisterViewModel model, 
+            ModelStateDictionary modelState,
+            HttpContext httpContext,
+            IHandleCustomRegistration customRegistration
+            )
         {
             var template = new LoginResultTemplate();
             IUserContext userContext = null;
@@ -237,7 +251,7 @@ namespace cloudscribe.Core.Web.Components
             {
                 userName = await userManager.SuggestLoginNameFromEmail(userManager.Site.Id, model.Email);
             }
-
+            
             var user = new SiteUser
             {
                 SiteId = userManager.Site.Id,
@@ -248,6 +262,9 @@ namespace cloudscribe.Core.Web.Components
                 DisplayName = model.DisplayName,
                 AccountApproved = userManager.Site.RequireApprovalBeforeLogin ? false : true
             };
+
+            await customRegistration.ProcessUserBeforeCreate(user, httpContext);
+            
 
             if (model.DateOfBirth.HasValue)
             {
@@ -263,14 +280,26 @@ namespace cloudscribe.Core.Web.Components
             }
 
             var result = await userManager.CreateAsync(user, model.Password);
-
+            
             if (result.Succeeded)
             {
                 template.User = user;
                 await loginRulesProcessor.ProcessAccountLoginRules(template);
             }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    modelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+           
 
-            if(template.RejectReasons.Count == 0 && user != null && template.SignInResult == SignInResult.Failed) // failed is initial state, could have been changed to lockedout
+            if(template.RejectReasons.Count == 0 
+                && user != null 
+                && template.SignInResult == SignInResult.Failed // failed is initial state, could have been changed to lockedout
+                && result.Errors.Count<IdentityError>() == 0
+                ) 
             {
                 await signInManager.SignInAsync(user, isPersistent: false);
                 template.SignInResult = SignInResult.Success;

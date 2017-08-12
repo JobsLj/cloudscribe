@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2014-10-26
-// Last Modified:			2017-06-30
+// Last Modified:			2017-07-14
 // 
 
 using cloudscribe.Core.Identity;
@@ -318,13 +318,15 @@ namespace cloudscribe.Core.Web.Controllers.Mvc
             model.AgreementRequired = Site.RegistrationAgreement.Length > 0;
             model.ExternalAuthenticationList = accountService.GetExternalAuthenticationSchemes();
 
+            var viewName = await customRegistration.GetRegisterViewName(Site, HttpContext);
+
             await customRegistration.HandleRegisterGet(
                 Site,
                 model,
                 HttpContext,
                 ViewData);
 
-            return View(model);
+            return View(viewName, model);
         }
 
         // POST: /Account/Register
@@ -346,6 +348,7 @@ namespace cloudscribe.Core.Web.Controllers.Mvc
             model.ExternalAuthenticationList = accountService.GetExternalAuthenticationSchemes();
 
             bool isValid = ModelState.IsValid;
+            
             bool customDataIsValid = await customRegistration.HandleRegisterValidation(
                 Site,
                 model,
@@ -377,12 +380,15 @@ namespace cloudscribe.Core.Web.Controllers.Mvc
                     }
                 }
 
-                if(!isValid || !customDataIsValid)
+                var viewName = await customRegistration.GetRegisterViewName(Site, HttpContext);
+
+                if (!isValid || !customDataIsValid)
                 {
-                    return View(model);
+                    return View(viewName, model);
                 }
                 
-                var result = await accountService.TryRegister(model);
+                var result = await accountService.TryRegister(model, ModelState, HttpContext, customRegistration);
+
                 if (result.SignInResult.Succeeded)
                 {
                     await customRegistration.HandleRegisterPostSuccess(
@@ -406,9 +412,9 @@ namespace cloudscribe.Core.Web.Controllers.Mvc
                     return HandleLoginNotAllowed(result);
                 }
                 
-                log.LogInformation($"login did not succeed for {model.Email}");
-                ModelState.AddModelError(string.Empty, sr["Invalid login attempt."]);
-                return View(model);           
+                log.LogInformation($"registration did not succeed for {model.Email}");
+               // ModelState.AddModelError(string.Empty, sr["Invalid registration attempt."]);
+                return View(viewName, model);           
             }
 
             // If we got this far, something failed, redisplay form
