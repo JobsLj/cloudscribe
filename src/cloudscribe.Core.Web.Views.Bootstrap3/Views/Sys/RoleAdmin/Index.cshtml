@@ -10,6 +10,7 @@
 @inject IOptions<SiteConfigOptions> setupOptionsAccessor
 @{
     var setupOptions = setupOptionsAccessor.Value;
+    ViewData["BodyClass"] = "admin-section role-index";
 }
 <div class="row">
     <div class="col-md-10 col-md-push-2">
@@ -65,6 +66,6 @@
         </div>
     </div>
     <div class="col-md-2 col-md-pull-10">
-        @await Component.InvokeAsync("Navigation", new { viewName = "SideNav", filterName = NamedNavigationFilters.ParentTree, startingNodeKey = "SiteAdmin" })
+        @await Component.InvokeAsync("Navigation", new { viewName = "SideNavAlt1", filterName = NamedNavigationFilters.ParentTree, startingNodeKey = "SiteAdmin" })
     </div>
 </div>

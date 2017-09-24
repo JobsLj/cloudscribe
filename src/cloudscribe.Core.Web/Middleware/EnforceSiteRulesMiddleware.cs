@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2017-05-26
-// Last Modified:			2017-05-26
+// Last Modified:			2017-09-15
 // 
 
 using cloudscribe.Core.Models;
@@ -62,7 +62,22 @@ namespace cloudscribe.Core.Web.Middleware
                 if(userContext.IsLockedOut || userContext.IsDeleted)
                 {
                     await accountService.SignOutAsync();
-                }   
+                }
+
+                //handle must change password
+                if (userContext.MustChangePwd)
+                {
+                    var changePasswordUrl = folderSegment + "/manage/changepassword";
+
+                    if (!context.Request.Path.StartsWithSegments(changePasswordUrl))
+                    {
+                        var logMessage = $"user {userContext.Email} has must change password so redirecting to change password page from requested path {context.Request.Path}";
+                        _logger.LogWarning(logMessage);
+                        context.Response.Redirect(changePasswordUrl);
+                    }
+                }
+
+
             }
             else
             {
@@ -103,7 +118,12 @@ namespace cloudscribe.Core.Web.Middleware
             {
                 var agreementUrl = folderSegment + "/account/termsofuse";
 
-                if (!context.Request.Path.StartsWithSegments(agreementUrl))
+                if (
+                    (!context.Request.Path.StartsWithSegments(agreementUrl))
+                    && (!context.Request.Path.StartsWithSegments("/oops/error"))
+                    && (!context.Request.Path.StartsWithSegments("/account/logoff"))
+                    && (!context.Request.Path.Value.EndsWith("css.map")) //css.map
+                    )
                 {
                     var logMessage = $"user {userContext.Email} has not accepted terms of use so redirecting to terms of use acceptance page from requested path {context.Request.Path}";
                     _logger.LogWarning(logMessage);

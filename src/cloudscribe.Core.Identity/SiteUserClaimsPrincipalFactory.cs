@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2015-06-27
-// Last Modified:			2016-09-30
+// Last Modified:			2017-07-25
 // 
 
 
@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,13 +53,19 @@ namespace cloudscribe.Core.Identity
                 throw new ArgumentNullException("user");
             }
 
+            var principal = await base.CreateAsync(user);
+            var id = principal.Identities.First();
+
             var userId = await UserManager.GetUserIdAsync(user);
             var userName = await UserManager.GetUserNameAsync(user);
 
-            var id = new ClaimsIdentity(
-                options.Cookies.ApplicationCookie.AuthenticationScheme,
-                Options.ClaimsIdentity.UserNameClaimType,
-                Options.ClaimsIdentity.RoleClaimType);
+            //commented out 20170-07-25 breaking chnage in 2.0
+            //var authScheme = options.Cookies.ApplicationCookie.AuthenticationScheme;
+            //var authScheme = "Identity.Application";
+            //var id = new ClaimsIdentity(
+            //    authScheme,
+            //    Options.ClaimsIdentity.UserNameClaimType,
+            //    Options.ClaimsIdentity.RoleClaimType);
 
             id.AddClaim(new Claim(Options.ClaimsIdentity.UserIdClaimType, userId));
             
@@ -99,7 +106,7 @@ namespace cloudscribe.Core.Identity
                 await provider.AddClaims(user, id);
             }
 
-            var principal = new ClaimsPrincipal(id);
+            //var principal = new ClaimsPrincipal(id);
             
             if (principal.Identity is ClaimsIdentity)
             {

@@ -1,4 +1,6 @@
 
+An open-source GUI prototyping tool that's available for ALL platforms.
+https://pencil.evolus.vn/
 
 https://medium.com/@hellostanley/design-doesnt-scale-4d81e12cbc3e#.cn4a04b6k
 
@@ -13,5 +15,8 @@ https://blog.marvelapp.com/body-text-small/
 
 https://andrewlock.net/adding-favicons-to-your-asp-net-core-website-with-realfavicongenerator/
 http://realfavicongenerator.net/
+
+https://www.smashingmagazine.com/2017/09/xrespond-building-responsive-websites-simpler/
+http://app.xrespond.com/
 
 

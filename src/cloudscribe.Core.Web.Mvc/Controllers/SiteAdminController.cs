@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2014-10-26
-// Last Modified:			2017-06-29
+// Last Modified:			2017-09-15
 // 
 
 using cloudscribe.Core.Models;
@@ -149,6 +149,7 @@ namespace cloudscribe.Core.Web.Controllers.Mvc
             model.SiteName = selectedSite.SiteName;
             model.AliasId = selectedSite.AliasId;
             model.GoogleAnalyticsProfileId = selectedSite.GoogleAnalyticsProfileId;
+            model.AddThisProfileId = selectedSite.AddThisDotComUsername;
             
             model.IsClosed = selectedSite.SiteIsClosed;
             model.ClosedMessage = selectedSite.SiteIsClosedMessage;
@@ -296,6 +297,7 @@ namespace cloudscribe.Core.Web.Controllers.Mvc
             selectedSite.SiteIsClosedMessage = model.ClosedMessage;
             selectedSite.Theme = model.Theme;
             selectedSite.GoogleAnalyticsProfileId = model.GoogleAnalyticsProfileId;
+            selectedSite.AddThisDotComUsername = model.AddThisProfileId;
 
             selectedSite.ForcedCulture = model.ForcedCulture;
             selectedSite.ForcedUICulture = model.ForcedUICulture;
@@ -305,12 +307,13 @@ namespace cloudscribe.Core.Web.Controllers.Mvc
             
             this.AlertSuccess(string.Format(sr["Basic site settings for {0} were successfully updated."],
                         selectedSite.SiteName), true);
-            
-            if (siteManager.CurrentSite.IsServerAdminSite)
-            {
-                // just edited from site list so redirect there
-                return RedirectToAction("SiteList", new { pageNumber = model.ReturnPageNumber });
-            }
+            // 2017-09-13 given many sites are single tenant
+            // lets not redirect to site list here, I often remove that from the menu when only one tenant is planned
+            //if (siteManager.CurrentSite.IsServerAdminSite)
+            //{
+            //    // just edited from site list so redirect there
+            //    return RedirectToAction("SiteList", new { pageNumber = model.ReturnPageNumber });
+            //}
             
             return RedirectToAction("Index");
         }
@@ -508,6 +511,7 @@ namespace cloudscribe.Core.Web.Controllers.Mvc
             model.CompanyPhone = selectedSite.CompanyPhone;
             model.CompanyFax = selectedSite.CompanyFax;
             model.CompanyPublicEmail = selectedSite.CompanyPublicEmail;
+            model.CompanyWebsite = selectedSite.CompanyWebsite;
 
             model.AvailableCountries.Add(new SelectListItem { Text = sr["-Please select-"], Value = "" });
             var countries = await geoDataManager.GetAllCountries();
@@ -587,6 +591,7 @@ namespace cloudscribe.Core.Web.Controllers.Mvc
             selectedSite.CompanyPhone = model.CompanyPhone;
             selectedSite.CompanyFax = model.CompanyFax;
             selectedSite.CompanyPublicEmail = model.CompanyPublicEmail;
+            selectedSite.CompanyWebsite = model.CompanyWebsite;
 
             await siteManager.Update(selectedSite);
             

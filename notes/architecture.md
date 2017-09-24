@@ -1,4 +1,7 @@
 
+https://blogs.msdn.microsoft.com/dotnet/2017/08/09/__trashed/
+
+http://www.forevolve.com/en/articles/2017/08/25/design-patterns-web-api-service-and-repository-part-5/
 
 
 https://www.microsoft.com/net/learn/architecture
@@ -6,6 +9,8 @@ https://www.microsoft.com/net/learn/architecture
 https://cloud.google.com/apis/design/
 
 http://msprogrammer.serviciipeweb.ro/2017/07/10/making-any-call-to-a-function-of-an-object-thread-safe/
+
+https://www.arangodb.com/2017/09/sorting-number-strings-numerically/
 
 Actor Model
 https://github.com/dotnet/orleans

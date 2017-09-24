@@ -31,7 +31,13 @@ namespace cloudscribe.Core.Models
         bool RequireApprovalBeforeLogin { get; } 
         string AccountApprovalEmailCsv { get; }
         int MaxInvalidPasswordAttempts { get; }
-        int MinRequiredPasswordLength { get; } 
+        int MinRequiredPasswordLength { get; }
+
+        bool PwdRequireNonAlpha { get; }
+        bool PwdRequireLowercase { get; }
+        bool PwdRequireUppercase { get; }
+        bool PwdRequireDigit { get; }
+
         bool UseEmailForLogin { get; }
         bool RequiresQuestionAndAnswer { get; }
         bool ReallyDeleteUsers { get; }
@@ -54,6 +60,7 @@ namespace cloudscribe.Core.Models
         string CompanyRegion { get; }
         string CompanyStreetAddress { get; }
         string CompanyStreetAddress2 { get; }
+        string CompanyWebsite { get; }
         string LoginInfoBottom { get;  }
         string LoginInfoTop { get; }
         string RegistrationAgreement { get; }
