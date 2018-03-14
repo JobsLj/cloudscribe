@@ -1,5 +1,18 @@
 
+Search Engine Optimization (SEO) Starter Guide
+https://support.google.com/webmasters/answer/7451184
+SEO Snippets
+https://www.youtube.com/watch?v=p74HC4x5AUE&list=PLKoqnv2vTMUPhLQ054sMg3vgzy9md9tWg
+
+https://getstream.io/blog/stop-using-io-domain-names-for-production-traffic/
+
+## To www or not to www
+http://www.yes-www.org/why-use-www/
 https://www.netlify.com/blog/2017/02/28/to-www-or-not-www/
+https://www.sitepoint.com/domain-www-or-no-www/
+http://www.wpbeginner.com/beginners-guide/www-vs-non-www-which-is-better-for-wordpress-seo/
+
+
 
 
 https://www.hanselman.com/blog/URLsAreUI.aspx

@@ -1,13 +1,23 @@
 
+http://www.natemcmaster.com/blog/2018/02/02/dotnet-global-tool/
+
+https://packagesearch.azurewebsites.net/
 
 https://github.com/dotnet/templating/wiki/Post-Action-Registry
+
+https://www.cloudscribe.com/docs/advanced-client-side-development-with-webpack?utm_source=projecttemplate&utm_medium=referral&utm_campaign=newproject-vsix
 
 
 https://marketplace.visualstudio.com/items?itemName=joeaudette.cloudscribeProjectTemplate
 https://www.nuget.org/packages/cloudscribe.templates/1.0.0
 
+dotnet new --install C:\_c\cloudscribe.templates\Content\WebApp
+dotnet new --debug:reinit
+
 dotnet new -i "cloudscribe.templates::*"
 dotnet new -u cloudscribe
+
+.\packtemplate.cmd
 
 https://github.com/dotnet/templating
 
@@ -55,9 +65,7 @@ https://rehansaeed.com/dotnet-new-feature-selection/
 
 https://github.com/dotnet/templating/blob/cb9edbfe02c038a306fbcb6bbe162462d5fb59f0/src/Microsoft.TemplateEngine.Orchestrator.RunnableProjects/Config/ConditionalConfig.cs
 
-dotnet new --install C:\_c\cloudscribe.templates\Content\WebApp
 
-dotnet new --debug:reinit
 
 dotnet new --install /Users/sayedhashimi/Documents/mycode/dotnet-new-samples/01-basic-template/SayedHa.StarterWeb
 

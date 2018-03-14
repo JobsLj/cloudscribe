@@ -2,23 +2,28 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2016-05-07
-// Last Modified:			2017-09-23
+// Last Modified:			2018-03-07
 // 
 
 
 using cloudscribe.Core.Models;
-using cloudscribe.Web.Common.Setup;
-using cloudscribe.Core.Web;
+using cloudscribe.Core.Models.Identity;
 using cloudscribe.Core.Web.Analytics;
 using cloudscribe.Core.Web.Components;
 using cloudscribe.Core.Web.Components.Messaging;
 using cloudscribe.Core.Web.ExtensionPoints;
+using cloudscribe.Core.Web.Mvc.Components;
 using cloudscribe.Core.Web.Navigation;
-using cloudscribe.Messaging.Email;
+using cloudscribe.Email;
+using cloudscribe.Email.ElasticEmail;
+using cloudscribe.Email.Mailgun;
+using cloudscribe.Email.SendGrid;
+using cloudscribe.Email.Smtp;
 using cloudscribe.Web.Common;
 using cloudscribe.Web.Common.Components;
 using cloudscribe.Web.Common.Models;
 using cloudscribe.Web.Common.Razor;
+using cloudscribe.Web.Common.Setup;
 using cloudscribe.Web.Navigation;
 using cloudscribe.Web.Navigation.Caching;
 using Microsoft.AspNetCore.Authorization;
@@ -30,33 +35,48 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using System;
 
-
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class StartupExtensions
     {
-        public static IServiceCollection AddCloudscribeCore(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddCloudscribeCoreMvc(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddCloudscribeCoreCommon(configuration);
+            //services.AddScoped<IVersionProvider, ControllerVersionInfo>();
+
+            services.TryAddScoped<IDecideErrorResponseType, DefaultErrorResponseTypeDecider>();
+
+
+            return services;
+        }
+
+        
+
+
+        public static IServiceCollection AddCloudscribeCoreCommon(this IServiceCollection services, IConfiguration configuration)
         {
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.TryAddScoped<ISmtpOptionsProvider, SiteSmtpOptionsResolver>();
+            
             services.Configure<MultiTenantOptions>(configuration.GetSection("MultiTenantOptions"));
-            services.Configure<SmtpOptions>(configuration.GetSection("SmtpOptions"));
+            services.Configure<NewUserOptions>(configuration.GetSection("NewUserOptions"));
+
             services.Configure<RecaptchaKeys>(configuration.GetSection("RecaptchaKeys"));
             services.Configure<SiteConfigOptions>(configuration.GetSection("SiteConfigOptions"));
             services.Configure<UIOptions>(configuration.GetSection("UIOptions"));
             
             services.Configure<CachingSiteResolverOptions>(configuration.GetSection("CachingSiteResolverOptions"));
-            
-           
+
+
             //services.AddMultitenancy<SiteSettings, SiteResolver>();
-            
+            services.TryAddScoped<ISiteContextResolver, SiteContextResolver>();
+
             services.AddMultitenancy<SiteContext, CachingSiteResolver>();
             services.AddScoped<CacheHelper, CacheHelper>();
 
             services.AddScoped<SiteEvents, SiteEvents>();
             services.AddScoped<SiteManager, SiteManager>();
-            services.AddScoped<AccountService, AccountService>();
+            services.TryAddScoped<IAccountService, AccountService>();
             services.AddScoped<GeoDataManager, GeoDataManager>();
             services.AddScoped<SystemInfoManager, SystemInfoManager>();
             services.AddScoped<IpAddressTracker, IpAddressTracker>();
@@ -72,25 +92,26 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddScoped<IHandleCustomUserInfoAdmin, NoUserEditCustomization>();
 
             services.TryAddScoped<IHandleAccountAnalytics, GoogleAccountAnalytics>();
-
-            //
-
-            //
-
+            
             services.AddCloudscribeCommmon(configuration);
             
-
             services.AddCloudscribePagination();
 
             services.AddScoped<IVersionProviderFactory, VersionProviderFactory>();
             services.AddScoped<IVersionProvider, CloudscribeCoreVersionProvider>();
-            
+            services.AddScoped<IVersionProvider, DataStorageVersionInfo>();
+            services.AddScoped<IVersionProvider, IdentityVersionInfo>();
 
+            services.Configure<SmtpOptions>(configuration.GetSection("SmtpOptions"));
+            services.TryAddScoped<ISmtpOptionsProvider, SiteSmtpOptionsResolver>();
+            services.TryAddScoped<IEmailSenderResolver, SiteEmailSenderResolver>();
             services.AddTransient<ISiteMessageEmailSender, SiteEmailMessageSender>();
             //services.AddTransient<ISiteMessageEmailSender, FakeSiteEmailSender>();
+            services.TryAddScoped<ISendGridOptionsProvider, SiteSendGridOptionsProvider>();
+            services.TryAddScoped<IMailgunOptionsProvider, SiteMailgunOptionsProvider>();
+            services.TryAddScoped<IElasticEmailOptionsProvider, SiteElasticEmailOptionsProvider>();
+            services.AddCloudscribeEmailSenders(configuration);
             
-            services.AddTransient<ISmsSender, SiteSmsSender>();
-
             services.TryAddSingleton<IThemeListBuilder, SiteThemeListBuilder>();
             //services.AddSingleton<IRazorViewEngine, CoreViewEngine>();
             services.TryAddScoped<ViewRenderer, ViewRenderer>();
@@ -109,6 +130,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.TryAddSingleton<ITempDataProvider, CookieTempDataProvider>();
             services.TryAddScoped<IRecaptchaKeysProvider, SiteRecaptchaKeysProvider>();
+
+            services.TryAddScoped<INewUserDisplayNameResolver, DefaultNewUserDisplayNameResolver>();
 
             services.AddCloudscribeFileManagerIntegration(configuration);
 
@@ -135,7 +158,8 @@ namespace Microsoft.Extensions.DependencyInjection
         //}
 
         
-
+        
+        /// this strategy to support views under /Sys really is a relic from mvc 5 not really needed now
         public static RazorViewEngineOptions AddCloudscribeViewLocationFormats(this RazorViewEngineOptions options)
         {
             options.ViewLocationFormats.Add("/Views/Sys/{1}/{0}" + RazorViewEngine.ViewExtension);
@@ -179,13 +203,36 @@ namespace Microsoft.Extensions.DependencyInjection
                 });
 
             options.AddPolicy(
+                "UserLookupPolicy",
+                authBuilder =>
+                {
+                    authBuilder.RequireRole("ServerAdmins", "Administrators");
+                });
+
+            options.AddPolicy(
                 "RoleAdminPolicy",
                 authBuilder =>
                 {
                     authBuilder.RequireRole("Role Administrators", "Administrators");
                 });
 
+            options.AddPolicy(
+                "RoleLookupPolicy",
+                authBuilder =>
+                {
+                    authBuilder.RequireRole("Role Administrators", "Administrators");
+                });
+
             return options;
+        }
+
+        [Obsolete("This method is deprecated, you should use services.AddCloudscribeCoreMvc instead.")]
+        public static IServiceCollection AddCloudscribeCore(this IServiceCollection services, IConfiguration configuration)
+        {
+
+            services.AddCloudscribeCoreCommon(configuration);
+
+            return services;
         }
 
     }

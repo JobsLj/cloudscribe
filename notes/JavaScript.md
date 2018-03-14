@@ -1,4 +1,13 @@
 
+https://stackoverflow.com/questions/436411/where-should-i-put-script-tags-in-html-markup/24070373#24070373
+https://teamtreehouse.com/community/best-practice-where-to-include-your-script-tags
+
+http://blog.ionic.io/the-end-of-framework-churn/
+
+https://remotestorage.io/
+
+https://medium.com/javascript-scene/elements-of-javascript-style-caa8821cb99f
+
 https://javascriptweblog.wordpress.com/2011/05/31/a-fresh-look-at-javascript-mixins/
 
 Why is bower still in use when they clearly state we should move to yarn/webpack?

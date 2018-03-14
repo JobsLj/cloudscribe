@@ -11,6 +11,7 @@ using Microsoft.Extensions.FileProviders;
 using System.Reflection;
 using cloudscribe.FileManager.Web.Controllers;
 using System;
+using cloudscribe.Web.Common.Setup;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -22,10 +23,11 @@ namespace Microsoft.Extensions.DependencyInjection
             )
         {
             services.TryAddScoped<FileManagerService>();
-            services.TryAddScoped<IImageResizer, ImageResizerService>();
+            services.TryAddScoped<IImageResizer, ImageSharpResizer>();
             services.TryAddScoped<IFileManagerNameRules, DefaultFileManagerNameRules>();
             services.TryAddScoped<IFileExtensionValidationRegexBuilder, FileExtensionValidationRegexBuilder>();
             services.TryAddScoped<IMediaPathResolver, DefaultMediaPathResolver>();
+            services.AddScoped<IVersionProvider, FileManagerVersionProvider>();
 
             // Angular's default header name for sending the XSRF token.
             services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");

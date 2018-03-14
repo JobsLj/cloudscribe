@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:				    2014-07-22
-// Last Modified:		    2017-07-25
+// Last Modified:		    2018-02-25
 // 
 //
 
@@ -18,6 +18,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using System.Security.Claims;
+using cloudscribe.Core.Models.EventHandlers;
+using cloudscribe.Pagination.Models;
+using cloudscribe.Core.Models.Identity;
 
 namespace cloudscribe.Core.Identity
 {
@@ -30,11 +33,13 @@ namespace cloudscribe.Core.Identity
         public SiteUserManager(
             SiteContext currentSite,
             UserEvents userEventHandlers,
+            IEnumerable<IHandleUserEmailConfirmed> emailConfirmedHandlers,
             IUserCommands userCommands,
             IUserQueries userQueries,
             IUserStore<TUser> store,
             IOptions<IdentityOptions> optionsAccessor,
             IOptions<MultiTenantOptions> multiTenantOptionsAccessor,
+            INewUserDisplayNameResolver displayNameResolver,
             IPasswordHasher<TUser> passwordHasher,
             IEnumerable<IUserValidator<TUser>> userValidators,
             IEnumerable<IPasswordValidator<TUser>> passwordValidators,
@@ -68,6 +73,9 @@ namespace cloudscribe.Core.Identity
             this.contextAccessor = contextAccessor;
             httpContext = contextAccessor?.HttpContext;
             eventHandlers = userEventHandlers;
+            this.passwordHasher = passwordHasher;
+            _emailConfirmedHandlers = emailConfirmedHandlers;
+            _displayNameResolver = displayNameResolver;
         }
         
         private IdentityOptions identityOptions;
@@ -78,6 +86,9 @@ namespace cloudscribe.Core.Identity
         private IHttpContextAccessor contextAccessor;
         private HttpContext httpContext;
         private UserEvents eventHandlers;
+        private IPasswordHasher<TUser> passwordHasher;
+        private IEnumerable<IHandleUserEmailConfirmed> _emailConfirmedHandlers;
+        private INewUserDisplayNameResolver _displayNameResolver;
 
         //private CancellationToken CancellationToken => httpContext?.RequestAborted ?? CancellationToken.None;
 
@@ -105,7 +116,7 @@ namespace cloudscribe.Core.Identity
         }
 
         
-        public Task<List<IUserInfo>> GetPage(Guid siteId, int pageNumber, int pageSize, string userNameBeginsWith, int sortMode)
+        public Task<PagedResult<IUserInfo>> GetPage(Guid siteId, int pageNumber, int pageSize, string userNameBeginsWith, int sortMode)
         {
             if (multiTenantOptions.UseRelatedSitesMode) { siteId = multiTenantOptions.RelatedSiteId; }
 
@@ -126,7 +137,7 @@ namespace cloudscribe.Core.Identity
             return queries.CountLockedByAdmin(siteId, CancellationToken);
         }
 
-        public Task<List<IUserInfo>> GetPageLockedUsers(
+        public Task<PagedResult<IUserInfo>> GetPageLockedUsers(
             Guid siteId,
             int pageNumber,
             int pageSize)
@@ -136,7 +147,7 @@ namespace cloudscribe.Core.Identity
             return queries.GetPageLockedByAdmin(siteId, pageNumber, pageSize, CancellationToken);
         }
 
-        public Task<List<IUserInfo>> GetUserAdminSearchPage(Guid siteId, int pageNumber, int pageSize, string searchInput, int sortMode)
+        public Task<PagedResult<IUserInfo>> GetUserAdminSearchPage(Guid siteId, int pageNumber, int pageSize, string searchInput, int sortMode)
         {
             if (multiTenantOptions.UseRelatedSitesMode) { siteId = multiTenantOptions.RelatedSiteId; }
 
@@ -158,7 +169,7 @@ namespace cloudscribe.Core.Identity
             return queries.CountNotApprovedUsers(siteId, CancellationToken);
         }
 
-        public Task<List<IUserInfo>> GetNotApprovedUsers(
+        public Task<PagedResult<IUserInfo>> GetNotApprovedUsers(
             Guid siteId,
             int pageNumber,
             int pageSize)
@@ -230,11 +241,13 @@ namespace cloudscribe.Core.Identity
                 SiteId = Site.Id,
                 UserName = userName,
                 Email = email,
-                DisplayName = email.Substring(0, email.IndexOf("@")),
                 FirstName = info.Principal.FindFirstValue(ClaimTypes.GivenName),
                 LastName = info.Principal.FindFirstValue(ClaimTypes.Surname),
                 AccountApproved = Site.RequireApprovalBeforeLogin ? false : true
             };
+            //https://github.com/joeaudette/cloudscribe/issues/346
+            user.DisplayName = _displayNameResolver.ResolveDisplayName(user);
+
             var result = await CreateAsync(user as TUser);
             if(result.Succeeded)
             {
@@ -245,7 +258,97 @@ namespace cloudscribe.Core.Identity
             return result;
         }
 
+        private IUserPasswordStore<TUser> GetPasswordStore()
+        {
+            var cast = Store as IUserPasswordStore<TUser>;
+            if (cast == null)
+            {
+                throw new NotSupportedException("StoreNotIUserPasswordStore");
+            }
+            return cast;
+        }
+
+        public async Task<IdentityResult> ChangeUserPassword(TUser user, string newPassword, bool validatePassword)
+        {
+            if (validatePassword)
+            {
+                var validate = await ValidatePassword(user, newPassword);
+                if (!validate.Succeeded)
+                {
+                    return validate;
+                }
+            }
+            // user.MustChangePwd will be set false by passwordStore.SetPasswordHashAsync so preserve it because this method is called by admins changing
+            // a user password and would still want this as true after admin changes the user password
+            var mustChangePwd = user.MustChangePwd; 
+
+            var hash = newPassword != null ? this.passwordHasher.HashPassword(user, newPassword) : null;
+            var passwordStore = GetPasswordStore();
+            await passwordStore.SetPasswordHashAsync(user, hash, CancellationToken);
+            user.MustChangePwd = mustChangePwd;
+            await UpdateAsync(user);
+            
+            return IdentityResult.Success;
+
+        }
+
+        protected async Task<IdentityResult> ValidatePassword(TUser user, string password)
+        {
+            var errors = new List<IdentityError>();
+            foreach (var v in PasswordValidators)
+            {
+                var result = await v.ValidateAsync(this, user, password);
+                if (!result.Succeeded)
+                {
+                    errors.AddRange(result.Errors);
+                }
+            }
+            if (errors.Count > 0)
+            {
+                Logger.LogWarning(14, "User {userId} password validation failed: {errors}.", await GetUserIdAsync(user), string.Join(";", errors.Select(e => e.Code)));
+                return IdentityResult.Failed(errors.ToArray());
+            }
+            return IdentityResult.Success;
+        }
+
+        public async Task<PagedResult<IUserLocation>> GetUserLocations(Guid siteId, Guid userId, int pageNumber, int pageSize)
+        {
+            return await queries.GetUserLocationsByUser(siteId, userId, pageNumber, pageSize);
+            //var result = new PagedResult<IUserLocation>();
+            //var list = await queries.GetUserLocationsByUser(siteId, userId, pageNumber, pageSize);
+            //result.Data = list.ToList();
+            //result.TotalItems = await queries.CountUserLocationsByUser(siteId, userId);
+            //result.PageNumber = pageNumber;
+            //result.PageSize = pageSize;
+
+            //return result;
+        }
+
         #region Overrides
+
+        public override async Task<IdentityResult> ConfirmEmailAsync(TUser user, string token)
+        {
+            var result = await base.ConfirmEmailAsync(user, token);
+
+            if(result.Succeeded)
+            {
+                foreach(var handler in _emailConfirmedHandlers)
+                {
+                    try
+                    {
+                        await handler.HandleUserEmailConfirmed(user);
+                    }
+                    catch(Exception ex)
+                    {
+                        Logger.LogError(ex.Message + " stack trace: " + ex.StackTrace);
+                    }
+                }
+            }
+
+            return result;
+
+            
+        }
 
         public override async Task<IdentityResult> CreateAsync(TUser user)
         {

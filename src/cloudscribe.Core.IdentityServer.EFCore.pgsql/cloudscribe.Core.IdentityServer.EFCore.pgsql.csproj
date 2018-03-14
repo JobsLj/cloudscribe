@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <Description>PostgreSql (pgsql) Entity Framework configuration and operational stores for IdentityServer4 cloudscribe multi-tenant identity integration</Description>
-    <VersionPrefix>2.0.0</VersionPrefix>
-    <VersionSuffix>preview20170821</VersionSuffix>
+    <VersionPrefix>2.1.3</VersionPrefix>
+    <AssemblyVersion>2.1.3</AssemblyVersion>
+
     <Authors>Joe Audette</Authors>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>cloudscribe.Core.IdentityServer.EFCore.pgsql</AssemblyName>
@@ -13,12 +14,11 @@
     <PackageIconUrl>https://raw.githubusercontent.com/joeaudette/cloudscribe/master/cloudscribe-icon-32.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/joeaudette/cloudscribe</PackageProjectUrl>
     <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0</PackageLicenseUrl>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    
   </PropertyGroup>
 
   <ItemGroup>
+  
     <ProjectReference Include="..\cloudscribe.Core.IdentityServerIntegration\cloudscribe.Core.IdentityServerIntegration.csproj" />
     <ProjectReference Include="..\cloudscribe.Core.Models\cloudscribe.Core.Models.csproj" />
     <ProjectReference Include="..\cloudscribe.Core.IdentityServer.EFCore.Common\cloudscribe.Core.IdentityServer.EFCore.Common.csproj" />
@@ -36,9 +36,6 @@
 
   <ItemGroup>
     
-    <PackageReference Include="cloudscribe.IDS4Fork" Version="2.0.0-*" />
-    
-   
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.0.*" />
@@ -46,6 +43,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.*" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.0.*" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.*" />
+    <PackageReference Include="IdentityServer4" Version="2.1.*" />
     
   </ItemGroup>
 

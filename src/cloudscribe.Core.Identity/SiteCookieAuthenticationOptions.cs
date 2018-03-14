@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2017-07-26
-// Last Modified:			2017-08-14
+// Last Modified:			2018-01-23
 // 
 
 using cloudscribe.Core.Models;
@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
+using System.Net;
 
 namespace cloudscribe.Core.Identity
 {
@@ -28,12 +29,14 @@ namespace cloudscribe.Core.Identity
             IOptions<MultiTenantOptions> multiTenantOptionsAccessor,
             IPostConfigureOptions<CookieAuthenticationOptions> cookieOptionsInitializer,
             IHttpContextAccessor httpContextAccessor,
+            ICookieAuthRedirector cookieAuthRedirector,
             ILogger<SiteCookieAuthenticationOptions> logger
             )
         {
             _multiTenantOptions = multiTenantOptionsAccessor.Value;
             _cookieOptionsInitializer = cookieOptionsInitializer;
             _httpContextAccessor = httpContextAccessor;
+            _cookieAuthRedirector = cookieAuthRedirector;
             _log = logger;
 
             _factory = factory;
@@ -52,6 +55,7 @@ namespace cloudscribe.Core.Identity
         private MultiTenantOptions _multiTenantOptions;
         private IPostConfigureOptions<CookieAuthenticationOptions> _cookieOptionsInitializer;
         private IHttpContextAccessor _httpContextAccessor;
+        private ICookieAuthRedirector _cookieAuthRedirector;
         private ILogger _log;
 
         private readonly IOptionsMonitorCache<CookieAuthenticationOptions> _cache;
@@ -98,6 +102,7 @@ namespace cloudscribe.Core.Identity
                 options.Cookie.Name = $"{scheme}-{tenant.SiteFolderName}";
                 options.Cookie.Path = "/" + tenant.SiteFolderName;
                 options.Events.OnValidatePrincipal = SiteAuthCookieValidator.ValidatePrincipalAsync;
+                
             }
 
             var tenantPathBase = string.IsNullOrEmpty(tenant.SiteFolderName)
@@ -107,6 +112,14 @@ namespace cloudscribe.Core.Identity
             options.LoginPath = tenantPathBase + "/account/login";
             options.LogoutPath = tenantPathBase + "/account/logoff";
             options.AccessDeniedPath = tenantPathBase + "/account/accessdenied";
+            
+            //https://github.com/IdentityServer/IdentityServer4.AspNetIdentity/blob/dev/src/IdentityServer4.AspNetIdentity/IdentityServerBuilderExtensions.cs
+            // we need to disable to allow iframe for authorize requests
+            options.Cookie.SameSite = SameSiteMode.None;
+
+            options.Events.OnRedirectToAccessDenied = _cookieAuthRedirector.ReplaceRedirector(HttpStatusCode.Forbidden, options.Events.OnRedirectToAccessDenied);
+            options.Events.OnRedirectToLogin = _cookieAuthRedirector.ReplaceRedirector(HttpStatusCode.Unauthorized, options.Events.OnRedirectToLogin);
+       
 
         }
 
@@ -182,110 +195,4 @@ namespace cloudscribe.Core.Identity
         }
     }
 
-    //public class SiteCookieAuthenticationOptionsPreview : IOptionsSnapshot<CookieAuthenticationOptions>
-    //{
-    //    public SiteCookieAuthenticationOptionsPreview(
-    //        IOptions<MultiTenantOptions> multiTenantOptionsAccessor,
-    //        IPostConfigureOptions<CookieAuthenticationOptions> cookieOptionsInitializer,
-    //        IHttpContextAccessor httpContextAccessor,
-    //        ILogger<SiteCookieAuthenticationOptionsPreview> logger
-    //        )
-    //    {
-    //        _multiTenantOptions = multiTenantOptionsAccessor.Value;
-    //        _cookieOptionsInitializer = cookieOptionsInitializer;
-    //        _httpContextAccessor = httpContextAccessor;
-    //        _log = logger;
-    //    }
-
-    //    private MultiTenantOptions _multiTenantOptions;
-    //    private IPostConfigureOptions<CookieAuthenticationOptions> _cookieOptionsInitializer;
-    //    private IHttpContextAccessor _httpContextAccessor;
-    //    private ILogger _log;
-
-    //    private CookieAuthenticationOptions ResolveOptions(string scheme)
-    //    {
-    //        var tenant = _httpContextAccessor.HttpContext.GetTenant<SiteContext>();
-
-    //        var options = new CookieAuthenticationOptions();
-    //        _cookieOptionsInitializer.PostConfigure(scheme, options);
-
-    //        if (scheme == IdentityConstants.ApplicationScheme)
-    //        {
-    //            ConfigureApplicationCookie(tenant, options, scheme);
-    //        }
-    //        else
-    //        {
-    //            ConfigureOtherCookies(tenant, options, scheme);
-    //        }
-
-    //        return options;
-
-    //    }
-
-    //    private void ConfigureApplicationCookie(SiteContext tenant, CookieAuthenticationOptions options, string scheme)
-    //    {
-    //        if (tenant == null)
-    //        {
-    //            _log.LogError("tenant was null");
-    //            return;
-    //        }
-
-    //        if (_multiTenantOptions.UseRelatedSitesMode)
-    //        {
-    //            options.Cookie.Name = scheme;
-    //            options.Cookie.Path = "/";
-    //        }
-    //        else
-    //        {
-    //            options.Cookie.Name = $"{scheme}-{tenant.SiteFolderName}";
-    //            options.Cookie.Path = "/" + tenant.SiteFolderName;
-    //            options.Events.OnValidatePrincipal = SiteAuthCookieValidator.ValidatePrincipalAsync;
-    //        }
-
-    //        var tenantPathBase = string.IsNullOrEmpty(tenant.SiteFolderName)
-    //            ? PathString.Empty
-    //            : new PathString("/" + tenant.SiteFolderName);
-
-    //        options.LoginPath = tenantPathBase + "/account/login";
-    //        options.LogoutPath = tenantPathBase + "/account/logoff";
-    //        options.AccessDeniedPath = tenantPathBase + "/account/accessdenied";
-
-    //    }
-
-    //    private void ConfigureOtherCookies(SiteContext tenant, CookieAuthenticationOptions options, string scheme)
-    //    {
-    //        if (tenant == null)
-    //        {
-    //            _log.LogError("tenant was null");
-    //            return;
-    //        }
-
-    //        if (_multiTenantOptions.UseRelatedSitesMode)
-    //        {
-    //            options.Cookie.Name = scheme;
-    //            options.Cookie.Path = "/";
-    //        }
-    //        else
-    //        {
-    //            options.Cookie.Name = $"{scheme}-{tenant.SiteFolderName}";
-    //            options.Cookie.Path = "/" + tenant.SiteFolderName;
-    //        }
-
-    //    }
-
-    //    public CookieAuthenticationOptions Value
-    //    {
-    //        get
-    //        {
-    //            return ResolveOptions(IdentityConstants.ApplicationScheme);
-    //        }
-    //    }
-
-    //    public CookieAuthenticationOptions Get(string name)
-    //    {
-    //        _log.LogInformation($"CookieAuthenticationOptions requested for {name}");
-
-    //        return ResolveOptions(name);
-    //    }
-    //}
 }

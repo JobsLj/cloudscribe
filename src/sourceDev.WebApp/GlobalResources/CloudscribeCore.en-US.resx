@@ -774,14 +774,14 @@
   <data name="Captcha Settings" xml:space="preserve">
     <value>Captcha Settings</value>
   </data>
-  <data name="Captcha Settings for {0} wwas successfully updated." xml:space="preserve">
-    <value>Captcha Settings for {0} wwas successfully updated.</value>
+  <data name="Captcha Settings for {0} was successfully updated." xml:space="preserve">
+    <value>Captcha Settings for {0} was successfully updated.</value>
   </data>
   <data name="Company Info" xml:space="preserve">
     <value>Company Info</value>
   </data>
-  <data name="Company Info for {0} wwas successfully updated." xml:space="preserve">
-    <value>Company Info for {0} wwas successfully updated.</value>
+  <data name="Company Info for {0} was successfully updated." xml:space="preserve">
+    <value>Company Info for {0} was successfully updated.</value>
   </data>
   <data name="Create New Site" xml:space="preserve">
     <value>Create New Site</value>
@@ -837,8 +837,8 @@
   <data name="Security Settings" xml:space="preserve">
     <value>Security Settings</value>
   </data>
-  <data name="Security Settings for {0} wwas successfully updated." xml:space="preserve">
-    <value>Security Settings for {0} wwas successfully updated.</value>
+  <data name="Security Settings for {0} was successfully updated." xml:space="preserve">
+    <value>Security Settings for {0} was successfully updated.</value>
   </data>
   <data name="Site Administration" xml:space="preserve">
     <value>Site Administration</value>
@@ -997,8 +997,8 @@
   <data name="Site Closed To Public Temporarily" xml:space="preserve">
     <value>Site Closed To Public Temporarily</value>
   </data>
-  <data name="Sorry for the delay, but this site requires approval of new accounts. An email has been site to the site managers notifying them of your registration request. You should recieve an email notifying you once your account has been approved." xml:space="preserve">
-    <value>Sorry for the delay, but this site requires approval of new accounts. An email has been site to the site managers notifying them of your registration request. You should recieve an email notifying you once your account has been approved.</value>
+  <data name="Sorry for the delay, but this site requires approval of new accounts. An email has been sent to the site managers notifying them of your registration request. You should recieve an email notifying you once your account has been approved." xml:space="preserve">
+    <value>Sorry for the delay, but this site requires approval of new accounts. An email has been sent to the site managers notifying them of your registration request. You should recieve an email notifying you once your account has been approved.</value>
   </data>
   <data name="The role name is already in use." xml:space="preserve">
     <value>The role name is already in use.</value>
@@ -1137,5 +1137,104 @@
   </data>
   <data name="Must Change Password" xml:space="preserve">
     <value>Must Change Password</value>
+  </data>
+  <data name="{0} - Users" xml:space="preserve">
+    <value>{0} - Users</value>
+  </data>
+  <data name="Activity" xml:space="preserve">
+    <value>Activity</value>
+  </data>
+  <data name="Capture Count" xml:space="preserve">
+    <value>Capture Count</value>
+  </data>
+  <data name="First Capture" xml:space="preserve">
+    <value>First Capture</value>
+  </data>
+  <data name="Ip Address" xml:space="preserve">
+    <value>Ip Address</value>
+  </data>
+  <data name="Last Capture" xml:space="preserve">
+    <value>Last Capture</value>
+  </data>
+  <data name="User Activity - {0}" xml:space="preserve">
+    <value>User Activity - {0}</value>
+  </data>
+  <data name="{0} - User Activity - {1}" xml:space="preserve">
+    <value>{0} - User Activity - {1}</value>
+  </data>
+  <data name="Add authenticator app" xml:space="preserve">
+    <value>Add authenticator app</value>
+  </data>
+  <data name="Authenticator app" xml:space="preserve">
+    <value>Authenticator app</value>
+  </data>
+  <data name="Configure authenticator app" xml:space="preserve">
+    <value>Configure authenticator app</value>
+  </data>
+  <data name="Disable 2FA" xml:space="preserve">
+    <value>Disable 2FA</value>
+  </data>
+  <data name="Disable two-factor authentication (2FA)" xml:space="preserve">
+    <value>Disable two-factor authentication (2FA)</value>
+  </data>
+  <data name="Enable authenticator" xml:space="preserve">
+    <value>Enable authenticator</value>
+  </data>
+  <data name="If you lose your device and don't have the recovery codes you will lose access to your account." xml:space="preserve">
+    <value>If you lose your device and don't have the recovery codes you will lose access to your account.</value>
+  </data>
+  <data name="If you reset your authenticator key your authenticator app will not work until you reconfigure it." xml:space="preserve">
+    <value>If you reset your authenticator key your authenticator app will not work until you reconfigure it.</value>
+  </data>
+  <data name="Once you have scanned the QR code or input the key above, your two factor authentication app will provide you with a unique code. Enter the code in the confirmation box below." xml:space="preserve">
+    <value>Once you have scanned the QR code or input the key above, your two factor authentication app will provide you with a unique code. Enter the code in the confirmation box below.</value>
+  </data>
+  <data name="Put these codes in a safe place." xml:space="preserve">
+    <value>Put these codes in a safe place.</value>
+  </data>
+  <data name="Recovery code verification" xml:space="preserve">
+    <value>Recovery code verification</value>
+  </data>
+  <data name="Recovery codes" xml:space="preserve">
+    <value>Recovery codes</value>
+  </data>
+  <data name="Reset authenticator key" xml:space="preserve">
+    <value>Reset authenticator key</value>
+  </data>
+  <data name="Reset recovery codes" xml:space="preserve">
+    <value>Reset recovery codes</value>
+  </data>
+  <data name="This action only disables 2FA." xml:space="preserve">
+    <value>This action only disables 2FA.</value>
+  </data>
+  <data name="This process disables 2FA until you verify your authenticator app and will also reset your 2FA recovery codes.  If you do not complete your authenticator app configuration you may lose access to your account." xml:space="preserve">
+    <value>This process disables 2FA until you verify your authenticator app and will also reset your 2FA recovery codes.  If you do not complete your authenticator app configuration you may lose access to your account.</value>
+  </data>
+  <data name="To use an authenticator app go through the following steps:" xml:space="preserve">
+    <value>To use an authenticator app go through the following steps:</value>
+  </data>
+  <data name="Two-factor authentication" xml:space="preserve">
+    <value>Two-factor authentication</value>
+  </data>
+  <data name="Verification Code" xml:space="preserve">
+    <value>Verification Code</value>
+  </data>
+  <data name="You have 1 recovery code left." xml:space="preserve">
+    <value>You have 1 recovery code left.</value>
+  </data>
+  <data name="You have no recovery codes left." xml:space="preserve">
+    <value>You have no recovery codes left.</value>
+  </data>
+  <data name="You have requested to login with a recovery code. This login will not be remembered until you provide an authenticator app code at login or disable 2FA and login again." xml:space="preserve">
+    <value>You have requested to login with a recovery code. This login will not be remembered until you provide an authenticator app code at login or disable 2FA and login again.</value>
+  </data>
+  <data name="Your login is protected with an authenticator app. Enter your authenticator code below." xml:space="preserve">
+    <value>Your login is protected with an authenticator app. Enter your authenticator code below.</value>
+  </data>
+  <data name="Disable 2 Factor Authentication" xml:space="preserve">
+    <value>Disable 2 Factor Authentication</value>
+  </data>
+  <data name="Reset Authenticator" xml:space="preserve">
+    <value>Reset Authenticator</value>
   </data>
 </root>

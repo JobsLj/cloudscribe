@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2016-01-18
-// Last Modified:			2016-05-28
+// Last Modified:			2018-03-03
 // 
 
 
@@ -19,133 +19,147 @@ namespace cloudscribe.Core.Web.Components
             IDataProtectionProvider dataProtectionProvider,
             ILogger<SiteDataProtector> logger)
         {
-            rawProtector = dataProtectionProvider.CreateProtector("cloudscribe.Core.Models.SiteSettings");
-            log = logger;
+            _rawProtector = dataProtectionProvider.CreateProtector("cloudscribe.Core.Models.SiteSettings");
+            _log = logger;
         }
 
-        private ILogger log;
-        private IDataProtector rawProtector = null;
-        private IPersistedDataProtector dataProtector
+        private ILogger _log;
+        private IDataProtector _rawProtector = null;
+        private IPersistedDataProtector DataProtector
         {
-            get { return rawProtector as IPersistedDataProtector; }
+            get { return _rawProtector as IPersistedDataProtector; }
         }
 
         public void Protect(ISiteSettings site)
         {
             if (site == null) { throw new ArgumentNullException("you must pass in an implementation of ISiteSettings"); }
             if (site.IsDataProtected) { return; }
-            if (dataProtector == null) { return; }
+            if (DataProtector == null) { return; }
 
             var countOfProtectedItems = 0;
 
-            if (site.FacebookAppSecret.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.FacebookAppSecret))
             {
                 try
                 {
-                    site.FacebookAppSecret = dataProtector.PersistentProtect(site.FacebookAppSecret);
+                    site.FacebookAppSecret = DataProtector.PersistentProtect(site.FacebookAppSecret);
                     countOfProtectedItems += 1;
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error: " + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error: {ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
 
-            if (site.GoogleClientSecret.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.GoogleClientSecret))
             {
                 try
                 {
-                    site.GoogleClientSecret = dataProtector.PersistentProtect(site.GoogleClientSecret);
+                    site.GoogleClientSecret = DataProtector.PersistentProtect(site.GoogleClientSecret);
                     countOfProtectedItems += 1;
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error: " + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error: {ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
 
-            if (site.MicrosoftClientSecret.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.MicrosoftClientSecret))
             {
                 try
                 {
-                    site.MicrosoftClientSecret = dataProtector.PersistentProtect(site.MicrosoftClientSecret);
+                    site.MicrosoftClientSecret = DataProtector.PersistentProtect(site.MicrosoftClientSecret);
                     countOfProtectedItems += 1;
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error: " + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error: {ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
 
-            if (site.TwitterConsumerSecret.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.TwitterConsumerSecret))
             {
                 try
                 {
-                    site.TwitterConsumerSecret = dataProtector.PersistentProtect(site.TwitterConsumerSecret);
+                    site.TwitterConsumerSecret = DataProtector.PersistentProtect(site.TwitterConsumerSecret);
                     countOfProtectedItems += 1;
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error: " + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error: {ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
 
-            if (site.SmtpPassword.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.SmtpPassword))
             {
                 try
                 {
-                    site.SmtpPassword = dataProtector.PersistentProtect(site.SmtpPassword);
+                    site.SmtpPassword = DataProtector.PersistentProtect(site.SmtpPassword);
                     countOfProtectedItems += 1;
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error: " + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error: {ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
 
-            if (site.OidConnectAppSecret.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.EmailApiKey))
             {
                 try
                 {
-                    site.OidConnectAppSecret = dataProtector.PersistentProtect(site.OidConnectAppSecret);
+                    site.EmailApiKey = DataProtector.PersistentProtect(site.EmailApiKey);
                     countOfProtectedItems += 1;
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error:" + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error: {ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
 
-            if (site.DkimPrivateKey.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.OidConnectAppSecret))
             {
                 try
                 {
-                    site.DkimPrivateKey = dataProtector.PersistentProtect(site.DkimPrivateKey);
+                    site.OidConnectAppSecret = DataProtector.PersistentProtect(site.OidConnectAppSecret);
                     countOfProtectedItems += 1;
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error:" + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error: {ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
 
-            if (site.SmsSecureToken.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.DkimPrivateKey))
             {
                 try
                 {
-                    site.SmsSecureToken = dataProtector.PersistentProtect(site.SmsSecureToken);
+                    site.DkimPrivateKey = DataProtector.PersistentProtect(site.DkimPrivateKey);
                     countOfProtectedItems += 1;
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error:" + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error: {ex.Message} stacktrace: {ex.StackTrace}");
+                }
+
+            }
+
+            if (!string.IsNullOrWhiteSpace(site.SmsSecureToken))
+            {
+                try
+                {
+                    site.SmsSecureToken = DataProtector.PersistentProtect(site.SmsSecureToken);
+                    countOfProtectedItems += 1;
+                }
+                catch (System.Security.Cryptography.CryptographicException ex)
+                {
+                    _log.LogError($"data protection error: {ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
@@ -162,138 +176,156 @@ namespace cloudscribe.Core.Web.Components
             if (site == null) { throw new ArgumentNullException("you must pass in an implementation of ISiteSettings"); }
             if (!site.IsDataProtected) { return; }
 
-            if (site.FacebookAppSecret.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.FacebookAppSecret))
             {
                 try
                 {
-                    site.FacebookAppSecret = dataProtector.PersistentUnprotect(site.FacebookAppSecret, out requiresMigration, out wasRevoked);
+                    site.FacebookAppSecret = DataProtector.PersistentUnprotect(site.FacebookAppSecret, out requiresMigration, out wasRevoked);
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error:" + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
                 catch (FormatException ex)
                 {
-                    log.LogError("data protection error: " + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
 
-            if (site.GoogleClientSecret.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.GoogleClientSecret))
             {
                 try
                 {
-                    site.GoogleClientSecret = dataProtector.PersistentUnprotect(site.GoogleClientSecret, out requiresMigration, out wasRevoked);
+                    site.GoogleClientSecret = DataProtector.PersistentUnprotect(site.GoogleClientSecret, out requiresMigration, out wasRevoked);
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error: " + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
                 catch (FormatException ex)
                 {
-                    log.LogError("data protection error:" + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
 
-            if (site.MicrosoftClientSecret.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.MicrosoftClientSecret))
             {
                 try
                 {
-                    site.MicrosoftClientSecret = dataProtector.PersistentUnprotect(site.MicrosoftClientSecret, out requiresMigration, out wasRevoked);
+                    site.MicrosoftClientSecret = DataProtector.PersistentUnprotect(site.MicrosoftClientSecret, out requiresMigration, out wasRevoked);
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error:" + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
                 catch (FormatException ex)
                 {
-                    log.LogError("data protection error:" + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
 
-            if (site.TwitterConsumerSecret.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.TwitterConsumerSecret))
             {
                 try
                 {
-                    site.TwitterConsumerSecret = dataProtector.PersistentUnprotect(site.TwitterConsumerSecret, out requiresMigration, out wasRevoked);
+                    site.TwitterConsumerSecret = DataProtector.PersistentUnprotect(site.TwitterConsumerSecret, out requiresMigration, out wasRevoked);
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error: " + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
                 catch (FormatException ex)
                 {
-                    log.LogError("data protection error: " + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
 
-            if (site.SmtpPassword.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.SmtpPassword))
             {
                 try
                 {
-                    site.SmtpPassword = dataProtector.PersistentUnprotect(site.SmtpPassword, out requiresMigration, out wasRevoked);
+                    site.SmtpPassword = DataProtector.PersistentUnprotect(site.SmtpPassword, out requiresMigration, out wasRevoked);
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error: " + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
                 catch (FormatException ex)
                 {
-                    log.LogError("data protection error:" + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
 
-            if (site.OidConnectAppSecret.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.EmailApiKey))
             {
                 try
                 {
-                    site.OidConnectAppSecret = dataProtector.PersistentUnprotect(site.OidConnectAppSecret, out requiresMigration, out wasRevoked);
+                    site.EmailApiKey = DataProtector.PersistentUnprotect(site.EmailApiKey, out requiresMigration, out wasRevoked);
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error: " + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
                 catch (FormatException ex)
                 {
-                    log.LogError("data protection error: " + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
 
-            if (site.SmsSecureToken.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.OidConnectAppSecret))
             {
                 try
                 {
-                    site.SmsSecureToken = dataProtector.PersistentUnprotect(site.SmsSecureToken, out requiresMigration, out wasRevoked);
+                    site.OidConnectAppSecret = DataProtector.PersistentUnprotect(site.OidConnectAppSecret, out requiresMigration, out wasRevoked);
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error: " + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
                 catch (FormatException ex)
                 {
-                    log.LogError("data protection error: " + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
+                }
+                
+
+            }
+
+            if (!string.IsNullOrWhiteSpace(site.SmsSecureToken))
+            {
+                try
+                {
+                    site.SmsSecureToken = DataProtector.PersistentUnprotect(site.SmsSecureToken, out requiresMigration, out wasRevoked);
+                }
+                catch (System.Security.Cryptography.CryptographicException ex)
+                {
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
+                }
+                catch (FormatException ex)
+                {
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
 
-            if (site.DkimPrivateKey.Length > 0)
+            if (!string.IsNullOrWhiteSpace(site.DkimPrivateKey))
             {
                 try
                 {
-                    site.DkimPrivateKey = dataProtector.PersistentUnprotect(site.DkimPrivateKey, out requiresMigration, out wasRevoked);
+                    site.DkimPrivateKey = DataProtector.PersistentUnprotect(site.DkimPrivateKey, out requiresMigration, out wasRevoked);
                 }
                 catch (System.Security.Cryptography.CryptographicException ex)
                 {
-                    log.LogError("data protection error:" + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
                 catch (FormatException ex)
                 {
-                    log.LogError("data protection error:" + ex.Message + " stacktrace: " + ex.StackTrace);
+                    _log.LogError($"data protection error:{ex.Message} stacktrace: {ex.StackTrace}");
                 }
 
             }
@@ -302,7 +334,7 @@ namespace cloudscribe.Core.Web.Components
 
             if (requiresMigration || wasRevoked)
             {
-                log.LogWarning("DataProtection key wasRevoked or requires migration, save site settings for " + site.SiteName + " to protect with a new key");
+                _log.LogWarning($"DataProtection key wasRevoked or requires migration, save site settings for {site.SiteName} to protect with a new key");
             }
 
             

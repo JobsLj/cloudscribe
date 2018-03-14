@@ -6,10 +6,12 @@ using cloudscribe.Core.IdentityServer.EFCore.Extensions;
 using cloudscribe.Core.IdentityServer.EFCore.Interfaces;
 using cloudscribe.Core.IdentityServer.EFCore.MySql;
 using cloudscribe.Core.IdentityServer.EFCore.Stores;
+using cloudscribe.Core.IdentityServerIntegration;
 using Microsoft.EntityFrameworkCore;
 //using MySQL.Data.EntityFrameworkCore;
 //using MySQL.Data.EntityFrameworkCore.Extensions;
 using System;
+using System.Collections.Generic;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -17,12 +19,16 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IIdentityServerBuilder AddCloudscribeCoreEFIdentityServerStorageMySql(
             this IIdentityServerBuilder builder,
-            string connectionString
+            string connectionString,
+            int maxConnectionRetryCount = 0,
+            int maxConnectionRetryDelaySeconds = 30,
+            ICollection<int> transientSqlErrorNumbersToAdd = null
             )
         {
             //builder.AddConfigurationStoreMSSQL(connectionString);    
             //builder.AddOperationalStoreMSSQL(connectionString);
-            builder.Services.AddCloudscribeCoreIdentityServerEFStorageMySql(connectionString);
+            builder.Services.AddCloudscribeCoreIdentityServerEFStorageMySql(connectionString, maxConnectionRetryCount, maxConnectionRetryDelaySeconds, transientSqlErrorNumbersToAdd);
+            builder.Services.AddScoped<IStorageInfo, StorageInfo>();
 
             return builder;
         }
@@ -83,7 +89,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IServiceCollection AddCloudscribeCoreIdentityServerEFStorageMySql(
             this IServiceCollection services,
-            string connectionString
+            string connectionString,
+            int maxConnectionRetryCount = 0,
+            int maxConnectionRetryDelaySeconds = 30,
+            ICollection<int> transientSqlErrorNumbersToAdd = null
             )
         {
             services.AddEntityFrameworkMySql()
@@ -94,9 +103,26 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddScoped<IConfigurationDbContext, ConfigurationDbContext>();
 
+            //services.AddEntityFrameworkMySql()
+            //    .AddDbContext<PersistedGrantDbContext>(options =>
+            //        options.UseMySql(connectionString));
+
             services.AddEntityFrameworkMySql()
                 .AddDbContext<PersistedGrantDbContext>(options =>
-                    options.UseMySql(connectionString));
+                    options.UseMySql(connectionString,
+                    mySqlOptionsAction: sqlOptions =>
+                    {
+                        if (maxConnectionRetryCount > 0)
+                        {
+                            //Configuring Connection Resiliency: https://docs.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency 
+                            sqlOptions.EnableRetryOnFailure(
+                                maxRetryCount: maxConnectionRetryCount,
+                                maxRetryDelay: TimeSpan.FromSeconds(maxConnectionRetryDelaySeconds),
+                                errorNumbersToAdd: transientSqlErrorNumbersToAdd);
+                        }
+
+
+                    }));
 
             services.AddScoped<IPersistedGrantDbContext, PersistedGrantDbContext>();
 

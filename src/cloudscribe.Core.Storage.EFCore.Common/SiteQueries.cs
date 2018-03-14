@@ -2,10 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2015-11-16
-// Last Modified:			2016-08-28
+// Last Modified:			2018-01-29
 // 
 
 using cloudscribe.Core.Models;
+using cloudscribe.Pagination.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -31,7 +32,9 @@ namespace cloudscribe.Core.Storage.EFCore.Common
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
 
-            var item = await dbContext.Sites.AsNoTracking().SingleOrDefaultAsync(
+            var item = await dbContext.Sites
+                .AsNoTracking()
+                .SingleOrDefaultAsync(
                     x => x.Id.Equals(siteId)
                     , cancellationToken)
                     .ConfigureAwait(false);
@@ -54,22 +57,30 @@ namespace cloudscribe.Core.Storage.EFCore.Common
             ThrowIfDisposed();
             cancellationToken.ThrowIfCancellationRequested();
 
-            var host = await dbContext.SiteHosts.AsNoTracking().FirstOrDefaultAsync(
+            var host = await dbContext.SiteHosts
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
                 x => x.HostName.Equals(hostName)
                 , cancellationToken)
                 .ConfigureAwait(false);
 
             if (host == null)
             {
-                var query = from s in dbContext.Sites
-                            .Take(1)
-                            orderby s.CreatedUtc ascending
-                            select s;
-
-                return await query
+                //var query = from s in dbContext.Sites
+                //            .Take(1)
+                //            orderby s.CreatedUtc ascending
+                //            select s;
+                return await dbContext.Sites
                     .AsNoTracking()
-                    .SingleOrDefaultAsync<SiteSettings>(cancellationToken)
-                    .ConfigureAwait(false);
+                    .OrderBy(s => s.CreatedUtc)
+                    .FirstOrDefaultAsync(cancellationToken)
+                    .ConfigureAwait(false)
+                    ;
+
+                //return await query
+                //    .AsNoTracking()
+                //    .SingleOrDefaultAsync<SiteSettings>(cancellationToken)
+                //    .ConfigureAwait(false);
             }
 
             return await dbContext.Sites
@@ -98,22 +109,25 @@ namespace cloudscribe.Core.Storage.EFCore.Common
             ISiteSettings site = null;
             if (!string.IsNullOrEmpty(folderName) && folderName != "root")
             {
-                site = await dbContext.Sites.AsNoTracking().FirstOrDefaultAsync(
-                x => x.SiteFolderName == folderName
+                site = await dbContext.Sites
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.SiteFolderName == folderName
                 , cancellationToken)
                 .ConfigureAwait(false);
             }
 
             if (site == null)
             {
-                var query = from s in dbContext.Sites
-                            where string.IsNullOrEmpty(s.SiteFolderName)
-                            orderby s.CreatedUtc ascending
-                            select s;
+                //var query = from s in dbContext.Sites
+                //            where string.IsNullOrEmpty(s.SiteFolderName)
+                //            orderby s.CreatedUtc ascending
+                //            select s;
 
-                site = await query.Take(1)
+                site = await dbContext.Sites
                     .AsNoTracking()
-                    .SingleOrDefaultAsync<SiteSettings>(cancellationToken)
+                    .Where(x => string.IsNullOrEmpty(x.SiteFolderName))
+                    .OrderBy(x => x.CreatedUtc)
+                    .FirstOrDefaultAsync(cancellationToken)
                     .ConfigureAwait(false);
             }
 
@@ -248,7 +262,7 @@ namespace cloudscribe.Core.Storage.EFCore.Common
                 , cancellationToken);
         }
 
-        public async Task<List<ISiteInfo>> GetPageOtherSites(
+        public async Task<PagedResult<ISiteInfo>> GetPageOtherSites(
             Guid currentSiteId,
             int pageNumber,
             int pageSize,
@@ -274,13 +288,19 @@ namespace cloudscribe.Core.Storage.EFCore.Common
                         };
 
 
-            return await query
+            var data = await query
                 .AsNoTracking()
                 .Skip(offset)
                 .Take(pageSize)
                 .ToListAsync<ISiteInfo>(cancellationToken)
                 .ConfigureAwait(false);
 
+            var result = new PagedResult<ISiteInfo>();
+            result.Data = data;
+            result.PageNumber = pageNumber;
+            result.PageSize = pageSize;
+            result.TotalItems = await CountOtherSites(currentSiteId, cancellationToken).ConfigureAwait(false);
+            return result;
 
         }
 
@@ -320,7 +340,7 @@ namespace cloudscribe.Core.Storage.EFCore.Common
             return await dbContext.SiteHosts.CountAsync<SiteHost>(cancellationToken);
         }
 
-        public async Task<List<ISiteHost>> GetPageHosts(
+        public async Task<PagedResult<ISiteHost>> GetPageHosts(
             int pageNumber,
             int pageSize,
             CancellationToken cancellationToken = default(CancellationToken))
@@ -336,12 +356,20 @@ namespace cloudscribe.Core.Storage.EFCore.Common
                         select x
                         ;
 
-            return await query
+            var data = await query
                 .AsNoTracking()
                 .Skip(offset)
                 .Take(pageSize)
                 .ToListAsync<ISiteHost>(cancellationToken)
                 .ConfigureAwait(false);
+
+            var result = new PagedResult<ISiteHost>();
+            result.Data = data;
+            result.PageNumber = pageNumber;
+            result.PageSize = pageSize;
+            result.TotalItems = await GetHostCount(cancellationToken).ConfigureAwait(false);
+            return result;
+
         }
 
         public async Task<List<ISiteHost>> GetSiteHosts(

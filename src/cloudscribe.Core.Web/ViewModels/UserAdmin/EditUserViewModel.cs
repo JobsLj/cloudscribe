@@ -8,7 +8,6 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-//using cloudscribe.Web.Common.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
@@ -40,10 +39,8 @@ namespace cloudscribe.Core.Web.ViewModels.Account
         
         public bool Trusted { get; set; }
 
-       
-        [Remote("UsernameAvailable", "Account", AdditionalFields = "UserId",
-           ErrorMessage = "Username not available, please try another value",
-           HttpMethod = "Post")]
+
+        //[Remote("UsernameAvailable", "Account", AdditionalFields = "UserId",  ErrorMessage = "Username not available, please try another value", HttpMethod = "Get")]
         [Required(ErrorMessage = "Username is required")]
         [StringLength(50, ErrorMessage = "Username has a maximum length of 50 characters")]
         public string Username { get; set; } = string.Empty;

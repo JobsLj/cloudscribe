@@ -7,6 +7,15 @@ https://github.com/philipwalton/analyticsjs-boilerplate
 
 http://googledevelopers.blogspot.com/2016/02/introducing-autotrack-for-analyticsjs.html
 
+forceSSL
+By default, tracking beacons sent from https pages will be sent using https while beacons sent from http pages will be sent using http. Setting forceSSL to true will force http pages to also send all beacons using https.
+
+Display Features
+https://developers.google.com/analytics/devguides/collection/analyticsjs/display-features
+https://support.google.com/analytics/answer/3450482
+
+https://www.themarketingtechnologist.co/setting-up-a-cookie-law-compliant-google-analytics-tracker/
+
 ## Tracking Users
 
 https://support.google.com/analytics/answer/3123662?hl=en
@@ -21,8 +30,12 @@ PII Viewer for Google Analytics is a Google Chrome extension which allows you to
 https://davidsimpson.me/pii-viewer-for-google-analytics/
 https://davidsimpson.me/2014/04/20/tutorial-send-user-ids-google-analytics/
 
-
 http://www.charlesfarina.com/login-and-signup-naming-conventions-for-google-analytics/
+
+userid vs &uid  short answer they are equivalent in js usage
+https://stackoverflow.com/questions/23379338/set-google-analytics-user-id-after-creating-the-tracker
+
+ga('set', '&uid', '1234567');
 
 ## Tracking code notes
 
@@ -46,6 +59,7 @@ utm_content: Used to differentiate similar content, or links within the same ad.
 
 
 https://www.cloudscribe.com/?utm_source=trailwise.org.uk&amp;utm_medium=referral&amp;utm_campaign=poweredby
+https://www.cloudscribe.com/?utm_source=vsix&amp;utm_medium=referral&amp;utm_campaign=vsix
 
 ### server side tracking
 
@@ -55,7 +69,9 @@ https://developers.google.com/analytics/devguides/collection/protocol/v1/
 https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide
 https://developers.google.com/analytics/devguides/collection/protocol/v1/parameters
 
-http://localhost:50827/campaignimages/arlo1.jpg?utm_source=projecttemplate&utm_medium=referral&utm_campaign=newproject-mytest
+http://localhost:50827/campaignimages/cloudscribe-logo650pt.png?utm_source=projecttemplate&utm_medium=referral&utm_campaign=newproject-mytest
+
+http://localhost:50827/
 
 ## Views
 
@@ -169,6 +185,20 @@ Name = Login Submit
    Maximum Value = 1
    Formating Type = Integer
    
+Name = Newsletter Signup Success
+   Index = 9
+   Value = 1
+   Minimum Value = 1
+   Maximum Value = 1
+   Formating Type = Integer
+   
+Name = Newsletter Signup Fail
+   Index = 10
+   Value = 1
+   Minimum Value = 1
+   Maximum Value = 1
+   Formating Type = Integer
+   
 
 ## Events
 
@@ -191,6 +221,8 @@ eventLabel	text	no	Useful for categorizing events (e.g. 'Fall Campaign')
 eventValue	integer	no	A numeric value associated with the event (e.g. 42)
 
 ## Setting Goals
+
+https://www.google.com/search?q=setting+goals+in+google+analytics
 
 https://blog.kissmetrics.com/critical-goal-types/
 
@@ -219,4 +251,47 @@ Event
       Minimum Value = 1
       Maximum Value = 1
       Formating Type = Integer
+	  
+## Tracking Ecommerce
+
+https://developers.google.com/analytics/devguides/collection/analyticsjs/ecommerce
+
+ga('require', 'ecommerce');
+
+Adding a Transaction
+
+Once the plugin has been loaded, it creates a transparent shopping cart object. You can add transaction and item data to the shopping cart, and once fully configured, you send all the data at once.
+
+You add transaction data to the shopping cart using the ecommerce:addTransaction command:
+
+ga('ecommerce:addTransaction', {
+  'id': '1234',                     // Transaction ID. Required.
+  'affiliation': 'Acme Clothing',   // Affiliation or store name.
+  'revenue': '11.99',               // Grand Total.
+  'shipping': '5',                  // Shipping.
+  'tax': '1.29'                     // Tax.
+});
+
+Adding Items
+
+Next, to add items to the shopping cart, you use the ecommerce:addItem command:
+
+ga('ecommerce:addItem', {
+  'id': '1234',                     // Transaction ID. Required.
+  'name': 'Fluffy Pink Bunnies',    // Product name. Required.
+  'sku': 'DD23444',                 // SKU/code.
+  'category': 'Party Toys',         // Category or variation.
+  'price': '11.99',                 // Unit price.
+  'quantity': '1'                   // Quantity.
+});
+
+Sending Data
+
+Finally, once you have configured all your ecommerce data in the shopping cart, you send the data to Google Analytics using the ecommerce:send command:
+
+ga('ecommerce:send');
+
+This command will go through each transaction and item in the shopping cart and send the respective data to Google Analytics. Once complete, the shopping cart is cleared and ready to send data for a new transaction. If a previous ecommerce:send command was issued, only new transaction and item data will be sent.
+
+Note: While most implementations will send both transaction and item data, you can send transactions without items, and items without transactions. If you send an item hit without a transaction, a transaction hit with only the ID will be sent automatically.
 	  

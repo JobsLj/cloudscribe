@@ -1,5 +1,7 @@
 
 
+https://madskristensen.net/blog/offline-aspnet-core-apps-with-service-workers/
+
 http://www.pwabuilder.com/
 
 Progressive web apps and the Windows ecosystem
@@ -16,3 +18,4 @@ https://alistapart.com/article/yes-that-web-project-should-be-a-pwa
 
 https://joreteg.com/blog/betting-on-the-web
 
+https://medium.com/samsung-internet-dev/6-myths-of-progressive-web-apps-81e28ca9d2b1

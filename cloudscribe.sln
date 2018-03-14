@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9C16B47A-B712-4237-B62F-B4403ACF1CD5}"
 EndProject
@@ -17,10 +17,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cloudscribe.Core.Identity", "src\cloudscribe.Core.Identity\cloudscribe.Core.Identity.csproj", "{1FCC067D-392A-41CF-B5FD-B01FA0807F81}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cloudscribe.Web.Common", "src\cloudscribe.Web.Common\cloudscribe.Web.Common.csproj", "{1431289E-CB67-47D7-971F-0E38E6AB24EB}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cloudscribe.Messaging.Email", "src\cloudscribe.Messaging.Email\cloudscribe.Messaging.Email.csproj", "{12687D6F-78E6-4652-B5EB-AEA7EB958B4F}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cloudscribe.Messaging.Sms", "src\cloudscribe.Messaging.Sms\cloudscribe.Messaging.Sms.csproj", "{BD12E0A5-DEBA-439C-8E15-C70B4A02ABEC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cloudscribe.Core.Storage.NoDb", "src\cloudscribe.Core.Storage.NoDb\cloudscribe.Core.Storage.NoDb.csproj", "{2CC25CD6-2EAD-4608-95E9-F16A43BE767B}"
 EndProject
@@ -66,6 +62,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cloudscribe.FileManager.Web
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cloudscribe.FileManager.CoreIntegration", "src\cloudscribe.FileManager.CoreIntegration\cloudscribe.FileManager.CoreIntegration.csproj", "{59C81D0F-4245-48EB-B635-A7F1B68532DE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cloudscribe.Core.Storage.EFCore.SQLite", "src\cloudscribe.Core.Storage.EFCore.SQLite\cloudscribe.Core.Storage.EFCore.SQLite.csproj", "{3B253931-F359-49F8-A129-B8D498603DC0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cloudscribe.Core.IdentityServer.EFCore.SQLite", "src\cloudscribe.Core.IdentityServer.EFCore.SQLite\cloudscribe.Core.IdentityServer.EFCore.SQLite.csproj", "{6BF15DED-80FC-4BD8-935F-A5A72B9BCF96}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tenant1SpaLocalApi", "src\Tenant1SpaLocalApi\Tenant1SpaLocalApi.csproj", "{7AAE4A99-0688-4ADC-A45A-149AF82D2EC1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "cloudscribe.Email.Senders", "src\cloudscribe.Email.Senders\cloudscribe.Email.Senders.csproj", "{A0243B8F-FC85-4A1F-B56C-7D4B793F8875}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -84,14 +88,6 @@ Global
 		{1431289E-CB67-47D7-971F-0E38E6AB24EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1431289E-CB67-47D7-971F-0E38E6AB24EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1431289E-CB67-47D7-971F-0E38E6AB24EB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{12687D6F-78E6-4652-B5EB-AEA7EB958B4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{12687D6F-78E6-4652-B5EB-AEA7EB958B4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{12687D6F-78E6-4652-B5EB-AEA7EB958B4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{12687D6F-78E6-4652-B5EB-AEA7EB958B4F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BD12E0A5-DEBA-439C-8E15-C70B4A02ABEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BD12E0A5-DEBA-439C-8E15-C70B4A02ABEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BD12E0A5-DEBA-439C-8E15-C70B4A02ABEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BD12E0A5-DEBA-439C-8E15-C70B4A02ABEC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2CC25CD6-2EAD-4608-95E9-F16A43BE767B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2CC25CD6-2EAD-4608-95E9-F16A43BE767B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2CC25CD6-2EAD-4608-95E9-F16A43BE767B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -180,6 +176,22 @@ Global
 		{59C81D0F-4245-48EB-B635-A7F1B68532DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59C81D0F-4245-48EB-B635-A7F1B68532DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59C81D0F-4245-48EB-B635-A7F1B68532DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B253931-F359-49F8-A129-B8D498603DC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B253931-F359-49F8-A129-B8D498603DC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B253931-F359-49F8-A129-B8D498603DC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B253931-F359-49F8-A129-B8D498603DC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BF15DED-80FC-4BD8-935F-A5A72B9BCF96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BF15DED-80FC-4BD8-935F-A5A72B9BCF96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BF15DED-80FC-4BD8-935F-A5A72B9BCF96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BF15DED-80FC-4BD8-935F-A5A72B9BCF96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AAE4A99-0688-4ADC-A45A-149AF82D2EC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AAE4A99-0688-4ADC-A45A-149AF82D2EC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AAE4A99-0688-4ADC-A45A-149AF82D2EC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AAE4A99-0688-4ADC-A45A-149AF82D2EC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0243B8F-FC85-4A1F-B56C-7D4B793F8875}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0243B8F-FC85-4A1F-B56C-7D4B793F8875}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0243B8F-FC85-4A1F-B56C-7D4B793F8875}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0243B8F-FC85-4A1F-B56C-7D4B793F8875}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -188,8 +200,6 @@ Global
 		{88448767-8DE6-4167-838A-71DB859A4644} = {9C16B47A-B712-4237-B62F-B4403ACF1CD5}
 		{1FCC067D-392A-41CF-B5FD-B01FA0807F81} = {9C16B47A-B712-4237-B62F-B4403ACF1CD5}
 		{1431289E-CB67-47D7-971F-0E38E6AB24EB} = {9C16B47A-B712-4237-B62F-B4403ACF1CD5}
-		{12687D6F-78E6-4652-B5EB-AEA7EB958B4F} = {9C16B47A-B712-4237-B62F-B4403ACF1CD5}
-		{BD12E0A5-DEBA-439C-8E15-C70B4A02ABEC} = {9C16B47A-B712-4237-B62F-B4403ACF1CD5}
 		{2CC25CD6-2EAD-4608-95E9-F16A43BE767B} = {9C16B47A-B712-4237-B62F-B4403ACF1CD5}
 		{E3434F61-5FF1-4DAF-83F0-CDBFA2D8FB47} = {9C16B47A-B712-4237-B62F-B4403ACF1CD5}
 		{FA25ABC0-74D2-479A-B8F0-18A6463BBB08} = {18722DAD-1668-4F56-A915-F6C65C1A6B74}
@@ -212,6 +222,10 @@ Global
 		{2E6B129D-5C85-4713-8747-CED53A4AFF34} = {9C16B47A-B712-4237-B62F-B4403ACF1CD5}
 		{8E2CF704-D9C4-4764-B321-6CD805C1E356} = {9C16B47A-B712-4237-B62F-B4403ACF1CD5}
 		{59C81D0F-4245-48EB-B635-A7F1B68532DE} = {9C16B47A-B712-4237-B62F-B4403ACF1CD5}
+		{3B253931-F359-49F8-A129-B8D498603DC0} = {9C16B47A-B712-4237-B62F-B4403ACF1CD5}
+		{6BF15DED-80FC-4BD8-935F-A5A72B9BCF96} = {9C16B47A-B712-4237-B62F-B4403ACF1CD5}
+		{7AAE4A99-0688-4ADC-A45A-149AF82D2EC1} = {9C16B47A-B712-4237-B62F-B4403ACF1CD5}
+		{A0243B8F-FC85-4A1F-B56C-7D4B793F8875} = {9C16B47A-B712-4237-B62F-B4403ACF1CD5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3FDA23E8-B945-4001-92C5-F6A70186E3B0}

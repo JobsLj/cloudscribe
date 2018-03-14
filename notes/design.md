@@ -1,4 +1,10 @@
 
+
+https://www.smashingmagazine.com/2017/11/comprehensive-guide-web-design/
+
+https://alistapart.com/article/user-interfaces-for-variable-fonts
+
+
 An open-source GUI prototyping tool that's available for ALL platforms.
 https://pencil.evolus.vn/
 

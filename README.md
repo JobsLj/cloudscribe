@@ -8,7 +8,7 @@ If you have questions or just want to be social, say hello in our gitter chat ro
 
 ### Build Status
 
-| Windows  | Linux/Mac |
+| Windows  | Linux |
 | ------------- | ------------- |
 | [![Build status](https://ci.appveyor.com/api/projects/status/jt9c0022x3odacar/branch/master?svg=true)](https://ci.appveyor.com/project/joeaudette/cloudscribe/branch/master)  | [![Build Status](https://travis-ci.org/joeaudette/cloudscribe.svg?branch=master)](https://travis-ci.org/joeaudette/cloudscribe)  |
 
@@ -20,13 +20,13 @@ Every web application or website project tends to need a certain amount of basic
 
 If you start a new web application project in Visual Studio using the standard project templates, what you get is just a basic implementation for user accounts via ASP.NET Identity. Those templates don't provide you any method for creating administrative users or creating roles or managing users and user role membership. You would typically have to implement that stuff yourself, and if you are like me, you don't want to have to implement that stuff again and again on every project. cloudscribe.Core aims to provide that for you with careful, well thought out implementations that adhere to [OWASP web security guidelines](https://www.owasp.org/index.php/Main_Page).
 
-To get started building your own features and applications with cloudscribe, [please see our StarterKit repository](https://github.com/joeaudette/cloudscribe.StarterKits)
+To get started building your own features and applications with cloudscribe, [please see our Introduction](https://www.cloudscribe.com/docs/introduction) to learn about our project template for Visual Studio or the .NET Core CLI
 
 #### Documentation
 
 [See the full documentation at cloudscribe.com](https://www.cloudscribe.com/docs) (work in progress)
 
-[Introduction](https://www.cloudscribe.com/docs/introduction) - get the big picture
+[Introduction](https://www.cloudscribe.com/docs/introduction) - get the big picture and learn how to start new projects using our project template for Visual Studio or the .NET Core CLI
 
 ##### What Is Included?:
 
@@ -45,7 +45,7 @@ To get started building your own features and applications with cloudscribe, [pl
 * There is a company information section where you can define company name, address, email etc, and then you could show that information in the footer for example by customizing the layout. SiteContext is already injected into the layout and the company information are just properties on that so you can wrap your own markup around whichever of those properties you want to show.
 * Integration with [IdentityServer4](https://github.com/IdentityServer/IdentityServer4) providing management of users, clients and scopes. This brings us support for [Jwt](https://jwt.io/) as an alternative to cookie authentication so we can more readily support SPA (Single Page Application) style web apps as well as authentication from mobile devices.
 * [Localization Support](https://www.cloudscribe.com/docs/localization)
-* For data access, supports Entity Framework Core with either MSSQL, MySql, or PostgreSql. [NoDb](https://github.com/joeaudette/NoDb) file system storage is also supported for small sites or proptypes.
+* For data access, supports Entity Framework Core with either SQLite, MSSQL, MySql, or PostgreSql. [NoDb](https://github.com/joeaudette/NoDb) file system storage is also supported for small sites or proptypes.
 * Data and IO operations are async all the way down
 * This project aims to follow the [OWASP](https://www.owasp.org/index.php/Main_Page) Guidelines for best practices in security
 

@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:					Joe Audette
 // Created:					2014-08-16
-// Last Modified:			2017-09-15
+// Last Modified:			2018-03-02
 // 
 
 using System;
@@ -364,6 +364,10 @@ namespace cloudscribe.Core.Models
 
         public bool SignEmailWithDkim { get; set; } = false;
 
+        public string EmailSenderName { get; set; } = "SmtpMailSender";
+        public string EmailApiKey { get; set; }
+        public string EmailApiEndpoint { get; set; }
+
 
         private string smsClientId = string.Empty;
         public string SmsClientId
@@ -594,6 +598,9 @@ namespace cloudscribe.Core.Models
             s.UseEmailForLogin = i.UseEmailForLogin;
             s.UseLdapAuth = i.UseLdapAuth;
             s.TermsUpdatedUtc = i.TermsUpdatedUtc;
+            s.EmailApiEndpoint = i.EmailApiEndpoint;
+            s.EmailApiKey = i.EmailApiKey;
+            s.EmailSenderName = i.EmailSenderName;
            
             return s;
         }

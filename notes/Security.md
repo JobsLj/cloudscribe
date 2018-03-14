@@ -1,4 +1,15 @@
 
+https://www.jerriepelser.com/blog/creating-dynamic-authorization-policies-aspnet-core/
+
+https://scottsauber.com/2018/01/29/increasing-password-hashing-iterations-with-asp-net-core-identity/
+
+
+https://www.troyhunt.com/locking-down-your-website-scripts-with-csp-hashes-nonces-and-report-uri/
+
+https://docs.nwebsec.com/en/latest/index.html
+
+https://www.jitbit.com/alexblog/256-targetblank---the-most-underestimated-vulnerability-ever/
+
 https://www.scientificamerican.com/article/the-only-safe-e-mail-is-text-only-e-mail/
 
 sms bug in aspnetcore 2.0 broke 2 factor auth
@@ -291,3 +302,9 @@ add allowed scopes
 openid and profile which also must be created as identoty resources
 
 optional add scopes for protected resource apis if applicable
+
+options.AddPolicy("api", policy =>
+{
+    policy.AuthenticationSchemes.Add("Bearer");
+	policy.RequireAuithenticatedUser();
+}

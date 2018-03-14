@@ -17,3 +17,19 @@ https://github.com/AssemblyScript
 
 https://blog.acolyer.org/2017/09/18/bringing-the-web-up-to-speed-with-webassembly/
 
+http://sellsbrothers.com/webassembly-explodes-client-side-programming
+
+https://blog.mozilla.org/blog/2017/11/13/webassembly-in-browsers/
+
+https://blog.octo.com/en/webassembly-an-executable-format-for-the-web/
+
+https://www.scirra.com/blog/218/apple-broke-webassembly-and-are-leaving-it-broken
+
+## Blazor
+
+https://blogs.msdn.microsoft.com/webdev/2018/02/06/blazor-experimental-project/
+
+https://www.dotnetrocks.com/default.aspx?ShowNum=1517
+
+https://www.youtube.com/watch?v=Ta_qXpXQqGQ&list=PL1rZQsJPBU2StolNg0aqvQswETPcYnNKL&index=0
+
