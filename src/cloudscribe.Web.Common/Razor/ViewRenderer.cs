@@ -5,15 +5,12 @@
 // Last Modified:           2018-03-02
 // 
 
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Routing;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -29,23 +26,23 @@ namespace cloudscribe.Web.Common.Razor
         public ViewRenderer(
             IRazorViewEngine viewEngine,
             ITempDataProvider tempDataProvider,
+            IActionContextAccessor actionAccessor,
             IServiceProvider serviceProvider
             )
         {
             _viewEngine = viewEngine;
             _tempDataProvider = tempDataProvider;
             _serviceProvider = serviceProvider;
-
-
+            _actionAccessor = actionAccessor;
         }
 
         private IRazorViewEngine _viewEngine;
         private ITempDataProvider _tempDataProvider;
         private IServiceProvider _serviceProvider;
-        
+        private IActionContextAccessor _actionAccessor;
+
         public async Task<string> RenderViewAsString<TModel>(string viewName, TModel model)
         {
-
             var viewData = new ViewDataDictionary<TModel>(
                         metadataProvider: new EmptyModelMetadataProvider(),
                         modelState: new ModelStateDictionary())
@@ -53,16 +50,18 @@ namespace cloudscribe.Web.Common.Razor
                 Model = model
             };
 
-            
-            var httpContext = new DefaultHttpContext { RequestServices = _serviceProvider };
-            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            //var httpContext = new DefaultHttpContext { RequestServices = _serviceProvider };
+            //var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
+            //var tempData = new TempDataDictionary(actionContext.HttpContext, _tempDataProvider);
+            var actionContext = _actionAccessor.ActionContext;
+
             var tempData = new TempDataDictionary(actionContext.HttpContext, _tempDataProvider);
 
             using (StringWriter output = new StringWriter())
             {
               
                 ViewEngineResult viewResult = _viewEngine.FindView(actionContext, viewName, true);
-
+                
                 ViewContext viewContext = new ViewContext(
                     actionContext,
                     viewResult.View,

@@ -1,5 +1,11 @@
 
 
+https://kruschecompany.com/blog/post/the-web-apps-that-will-eat-mobile
+
+https://blog.elmah.io/turning-an-aspnet-core-website-into-a-progressive-web-app-pwa/
+https://www.nuget.org/packages/WebEssentials.AspNetCore.PWA/
+https://github.com/madskristensen/WebEssentials.AspNetCore.ServiceWorker
+
 https://madskristensen.net/blog/offline-aspnet-core-apps-with-service-workers/
 
 http://www.pwabuilder.com/

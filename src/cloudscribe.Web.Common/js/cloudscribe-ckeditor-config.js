@@ -7,7 +7,7 @@
 	//config.justifyClasses = [ 'AlignLeft', 'AlignCenter', 'AlignRight', 'AlignJustify' ];
 	//config.indentClasses = ['Indent1', 'Indent2', 'Indent3'];
     config.extraPlugins = 'oembed,cloudscribe-filedrop,sourcedialog,codesnippet,autosave,notification';
-    config.autosave = {saveDetectionSelectors : "a[href^='javascript:__doPostBack'][id*='Save'],a[id*='Cancel'],button[id*='Save']"};
+    config.autosave = { saveDetectionSelectors: "a[href^='javascript:__doPostBack'][id*='Save'],a[id*='Cancel'],button[id*='Save']", messageType: "no"};
 	
     config.removePlugins = 'scayt,wsc';
 	//config.oembed_maxWidth = '560';
@@ -55,7 +55,7 @@
 		['NumberedList','BulletedList','-','Outdent','Indent','Blockquote'],
 		['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
 		['Link','Unlink','Anchor'],
-		['Image','Flash','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'],
+		['Image','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'],
 		'/',
 		['Styles','Format','Font','FontSize'],
 		['TextColor','BGColor'],
@@ -73,7 +73,7 @@
 		'/',
 		['Blockquote','Format','Styles','FontSize'],['NumberedList','BulletedList'],
 		['Link','Unlink','Anchor'],
-		['Image','Flash','oembed','Table','HorizontalRule','Smiley','SpecialChar']
+		['Image','oembed','Table','HorizontalRule','Smiley','SpecialChar']
 
     ];
 

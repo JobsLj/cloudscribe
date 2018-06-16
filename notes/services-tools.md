@@ -16,6 +16,8 @@ https://twitter.com/brightercommand/status/862286249591267329?lang=en
 
 https://github.com/jbogard/MediatR/wiki
 
+https://github.com/jbogard/MediatR.Extensions.Microsoft.DependencyInjection
+
 # Brighter
 
 Command Dispatcher, Processor, and Distributed Task Queue
@@ -51,3 +53,9 @@ https://www.ipify.org/
 # Selenium stand alone server
 
 https://www.seleniumhq.org/download/
+
+# Web notifications and toasts
+
+this goes well with signalr
+https://sciactive.com/pnotify/
+https://github.com/sciactive/pnotify

@@ -5,6 +5,7 @@
 // Last Modified:			2018-03-07
 // 
 
+using cloudscribe.Core.DataProtection;
 using cloudscribe.Core.Models;
 using cloudscribe.Pagination.Models;
 using Microsoft.AspNetCore.Http;
@@ -350,6 +351,7 @@ namespace cloudscribe.Core.Web.Components
             adminUser.Email = "admin" + siteDifferentiator + "@admin.com";
             adminUser.NormalizedEmail = adminUser.Email.ToUpperInvariant();
             adminUser.UserName = "admin" + siteDifferentiator;
+            adminUser.NormalizedUserName = adminUser.UserName.ToUpperInvariant();
             
             await _userCommands.Create(adminUser, CancellationToken.None);
             

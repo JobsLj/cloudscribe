@@ -210,3 +210,8 @@ src/sourceDev.WebApp/wwwroot/images/main-header-image-13.jpg
 src/sourceDev.WebApp/wwwroot/css/site.min.css.gz
 src/sourceDev.WebApp/cloudscribe.dev.db
 **/wwwroot/testfiles/**
+**/custom1/wwwroot/css/**
+
+# Cake
+tools/**
+!tools/packages.config

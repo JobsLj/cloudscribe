@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 // Author:              Joe Audette
 // Created:             2016-02-04
-// Last Modified:       2018-03-13
+// Last Modified:       2018-04-26
 // 
 
 using cloudscribe.Core.Models;
@@ -27,7 +27,7 @@ namespace cloudscribe.Core.Web.Components
         {
             TenantContext<SiteContext> tenantContext = null;
             CancellationToken cancellationToken = context?.RequestAborted ?? CancellationToken.None;
-            var site = await _siteContextResolver.ResolveSite(context.Request.Host.Value, context.Request.Path.StartingSegment(), cancellationToken);
+            var site = await _siteContextResolver.ResolveSite(context.Request.Host.Value, context.Request.Path, cancellationToken);
 
             if (site != null)
             {

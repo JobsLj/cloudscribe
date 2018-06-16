@@ -1,14 +1,15 @@
-﻿using System;
+﻿using cloudscribe.Core.Models;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace cloudscribe.Core.Models
+namespace cloudscribe.Core.Web.Components
 {
     public interface ISiteContextResolver
     {
         Task<SiteContext> ResolveSite(
             string hostName,
-            string pathStartingSegment,
+            string path,
             CancellationToken cancellationToken = default(CancellationToken)
             );
 

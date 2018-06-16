@@ -2,12 +2,13 @@
 using cloudscribe.Web.Common.Analytics;
 using cloudscribe.Web.Common.Components;
 using cloudscribe.Web.Common.Helpers;
+using cloudscribe.Web.Common.Http;
 using cloudscribe.Web.Common.Models;
+using cloudscribe.Web.Common.Recaptcha;
 using cloudscribe.Web.Common.Setup;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
@@ -24,6 +25,10 @@ namespace Microsoft.Extensions.DependencyInjection
             IConfiguration configuration = null)
         {
             services.TryAddSingleton<IDateTimeZoneProvider>(new DateTimeZoneCache(TzdbDateTimeZoneSource.Default));
+            services.TryAddSingleton<IHttpClientProvider, DefaultHttpClientProvider>();
+
+            services.TryAddScoped<IRecaptchaServerSideValidator, RecaptchaServerSideValidator>();
+
             services.TryAddScoped<ITimeZoneHelper, TimeZoneHelper>();
             services.TryAddScoped<IResourceHelper, ResourceHelper>();
 
@@ -56,46 +61,16 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        public static RazorViewEngineOptions AddCloudscribeCommonEmbeddedViews(this RazorViewEngineOptions options)
-        {
-            options.FileProviders.Add(new EmbeddedFileProvider(
-                   typeof(CloudscribeCommonResources).GetTypeInfo().Assembly,
-                   "cloudscribe.Web.Common"
-               ));
-
-            return options;
-        }
-
-        //public static IRouteBuilder AddRoutesForCloudscribeCommonResources(this IRouteBuilder routes)
+        //public static RazorViewEngineOptions AddCloudscribeCommonEmbeddedViews(this RazorViewEngineOptions options)
         //{
-            
-        //    routes.MapRoute(
-        //       name: "crjs",
-        //       template: "cr/js/{*slug}"
-        //       , defaults: new { controller = "cr", action = "js" }
-        //       );
+        //    options.FileProviders.Add(new EmbeddedFileProvider(
+        //           typeof(CloudscribeCommonResources).GetTypeInfo().Assembly,
+        //           "cloudscribe.Web.Common"
+        //       ));
 
-        //    routes.MapRoute(
-        //       name: "crcss",
-        //       template: "cr/css/{*slug}"
-        //       , defaults: new { controller = "cr", action = "css" }
-        //       );
-
-        //    routes.MapRoute(
-        //       name: "crfonts",
-        //       template: "cr/fonts/{*slug}"
-        //       , defaults: new { controller = "cr", action = "fonts" }
-        //       );
-
-        //    routes.MapRoute(
-        //       name: "crimages",
-        //       template: "cr/images/{*slug}"
-        //       , defaults: new { controller = "cr", action = "images" }
-        //       );
-
-        //    return routes;
+        //    return options;
         //}
-
+        
         public static IApplicationBuilder UseCloudscribeCommonStaticFiles(this IApplicationBuilder builder)
         {
 
